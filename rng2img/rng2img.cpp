@@ -3,8 +3,19 @@
 
 #define SIZE 32
 
+int usage()
+{
+    fprintf(stderr, "Usage: rng2img hash > hash.ppm\n");
+    return 1;
+}
+
+
 int main(int argc, char** argv)
 {
+
+    if (argc != 2)
+        return usage();
+
     uint8_t (*pixels)[3] = new uint8_t[SIZE*SIZE][3];
     
 

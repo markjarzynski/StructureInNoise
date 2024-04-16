@@ -18,10 +18,11 @@ def SIFT(image):
     matches = bf.knnMatch(des1, des2, k=2)
     matches = [y for (x,y) in matches]
 
-    img3 = cv2.drawMatches(img1, kp1, img2, kp2, matches[:50], img2, flags=2)
-    plt.imshow(img3),plt.show()
-    
+    img3 = cv2.drawMatches(img1, kp1, img2, kp2, matches[:50], img2, flags=2) 
+
+    return img3
 
 if __name__ == "__main__":
     image = cv2.imread('./rng2img/city.png')
-    SIFT(image)
+    image = SIFT(image)
+    plt.imshow(image),plt.show()

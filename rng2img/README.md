@@ -17,3 +17,11 @@ Use ImageMagick to convert it to a PNG
 ```
 $ convert hash.ppm hash.png
 ```
+
+The Makefile command all will produce every single Integer ppm.
+The Makefile command convert will convert every ppm into a png.
+You can run both at once with this command:
+
+```
+$ make all && make convert
+```

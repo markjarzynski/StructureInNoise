@@ -28,7 +28,7 @@ def ORB(image):
     return matched_image
 
 if __name__ == "__main__":
-    image = cv2.imread('./rng2img/Hash Images/esgtsa_linear.png')
+    image = cv2.imread('./rng2img/esgtsa_linear.png')
 
     if image is None:
         print("Error: Image did not load.")

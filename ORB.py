@@ -9,15 +9,13 @@ def ORB(image):
     keypoints, descriptors = detector.detectAndCompute(gray, None)
 
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
-    matches = bf.knnMatch(descriptors, descriptors, k=3)
+    matches = bf.knnMatch(descriptors, descriptors, k=2)
 
     filtered_matches = []
-    thres_ratio = 0.75
-    min_distance = 50  # set minimum pixel distance to filter trivial self-matches
+    min_distance = 70  # set minimum pixel distance to filter trivial self-matches
 
     filtered_matches = [
-        n for _, m, n in matches                            # ignore first match in knn as it is always a self-match
-        if (m.distance / n.distance) < thres_ratio and      # Lowe's ratio test to filter matches
+        n for (m, n) in matches if # ignore first match in knn as it is always a self-match
         np.linalg.norm(np.array(keypoints[n.queryIdx].pt) - np.array(keypoints[n.trainIdx].pt)) >= min_distance
     ]
 
@@ -30,7 +28,7 @@ def ORB(image):
     return matched_image
 
 if __name__ == "__main__":
-    image = cv2.imread('./rng2img/hybridtaus.png')
+    image = cv2.imread('./rng2img/Hash Images/esgtsa_linear.png')
 
     if image is None:
         print("Error: Image did not load.")

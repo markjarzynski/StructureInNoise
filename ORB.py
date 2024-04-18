@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
+from RANSAC import ransac
+
 def ORB(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -15,9 +17,11 @@ def ORB(image):
     min_distance = 70  # set minimum pixel distance to filter trivial self-matches
 
     filtered_matches = [
-        n for (m, n) in matches if # ignore first match in knn as it is always a self-match
-        np.linalg.norm(np.array(keypoints[n.queryIdx].pt) - np.array(keypoints[n.trainIdx].pt)) >= min_distance
+        match for (_, match) in matches if # ignore first match in knn as it is always a self-match
+        np.linalg.norm(np.array(keypoints[match.queryIdx].pt) - np.array(keypoints[match.trainIdx].pt)) >= min_distance
     ]
+
+    _, _, filtered_matches = ransac(filtered_matches, keypoints, keypoints)
 
     # debugging
     print("Total matches found:", len(matches))
@@ -28,7 +32,7 @@ def ORB(image):
     return matched_image
 
 if __name__ == "__main__":
-    image = cv2.imread('./rng2img/esgtsa_linear.png')
+    image = cv2.imread('./rng2img/Hash Images/esgtsa_linear.png')
 
     if image is None:
         print("Error: Image did not load.")

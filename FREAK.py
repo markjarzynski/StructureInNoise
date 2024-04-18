@@ -1,43 +1,45 @@
-import sys
 import cv2
+import numpy as np
 import matplotlib.pyplot as plt
 
+from RANSAC import ransac
+
 def FREAK(image):
-    img1 = image.copy()
-    img2 = image.copy()
-    
-    gray1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-    gray2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
-    
-    fast = cv2.FastFeatureDetector_create()
-    freak = cv2.xfeatures2d.FREAK_create()
-    
-    kp1 = fast.detect(gray1, None)
-    kp2 = fast.detect(gray2, None)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    kp1, des1 = freak.compute(gray1, kp1)
-    kp2, des2 = freak.compute(gray2, kp2)
-    
-    bf = cv2.BFMatcher()
-    
-    matches = bf.knnMatch(des1, des2, k=2)
-    matches = [y for (x,y) in matches]
+    det = cv2.FastFeatureDetector_create()  # create FAST detector
+    ext = cv2.xfeatures2d.FREAK_create()    # create FREAK extractor
 
-    img3 = cv2.drawMatches(img1, kp1, img2, kp2, matches[:50], img2, flags=2) 
+    # first detect keypoints then compute descriptors
+    keypoints = det.detect(gray, None)
+    _, descriptors = ext.compute(gray, keypoints)
 
-    return img3
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING) # binary descriptors generated (Hamming distance specified)
+    matches = bf.knnMatch(descriptors, descriptors, k=2)
 
-    plt.imshow(image),plt.show()
+    filtered_matches = []
+    min_distance = 70  # set minimum pixel distance to filter trivial self-matches
 
-def usage():
-    print("Usage: ./main.py <image>")
+    filtered_matches = [
+        match for (_, match) in matches if # ignore first match in knn as it is always a self-match
+        np.linalg.norm(np.array(keypoints[match.queryIdx].pt) - np.array(keypoints[match.trainIdx].pt)) >= min_distance
+    ]
+
+    _, _, filtered_matches = ransac(filtered_matches, keypoints, keypoints)
+
+    # debugging
+    print("Total matches found:", len(matches))
+    print("Number of keypoints:", len(keypoints))
+    print("Number of refined matches:", len(filtered_matches))
+
+    matched_image = cv2.drawMatches(image, keypoints, image, keypoints, filtered_matches[:30], None, flags=2)
+    return matched_image
 
 if __name__ == "__main__":
+    image = cv2.imread('./rng2img/Hash Images/esgtsa_linear.png')
 
-    if len(sys.argv) != 2:
-        usage()
-        exit()
-
-    image = cv2.imread(sys.argv[1])
-    image = FREAK(image)
-    cv2.imwrite('FREAK_out.png', image) 
+    if image is None:
+        print("Error: Image did not load.")
+    else:
+        image = FREAK(image)
+        plt.imshow(image),plt.show()

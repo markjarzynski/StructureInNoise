@@ -1,39 +1,41 @@
-import sys
 import cv2
+import numpy as np
 import matplotlib.pyplot as plt
 
+from RANSAC import ransac
+
 def BRISK(image):
-    img1 = image.copy()
-    img2 = image.copy()
-    
-    gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
-    gray2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
-    
-    brisk = cv2.BRISK_create()
-    
-    kp1, des1 = brisk.detectAndCompute(gray,None)
-    kp2, des2 = brisk.detectAndCompute(gray2,None)
-    
-    bf = cv2.BFMatcher()
-    
-    matches = bf.knnMatch(des1, des2, k=2)
-    matches = [y for (x,y) in matches]
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    img3 = cv2.drawMatches(img1, kp1, img2, kp2, matches[:50], img2, flags=2) 
+    detector = cv2.BRISK_create()
+    keypoints, descriptors = detector.detectAndCompute(gray, None)
 
-    return img3
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
+    matches = bf.knnMatch(descriptors, descriptors, k=2)
 
-    plt.imshow(image),plt.show()
+    filtered_matches = []
+    min_distance = 70  # set minimum pixel distance to filter trivial self-matches (in this case 200 seems to be the best value found so far)
 
-def usage():
-    print("Usage: ./main.py <image>")
+    filtered_matches = [
+        match for (_, match) in matches if # ignore first match in knn as it is always a self-match
+        np.linalg.norm(np.array(keypoints[match.queryIdx].pt) - np.array(keypoints[match.trainIdx].pt)) >= min_distance
+    ]
+
+    _, _, filtered_matches = ransac(filtered_matches, keypoints, keypoints)
+
+    # debugging
+    print("Total matches found:", len(matches))
+    print("Number of keypoints:", len(keypoints))
+    print("Number of refined matches:", len(filtered_matches))
+
+    matched_image = cv2.drawMatches(image, keypoints, image, keypoints, filtered_matches[:30], None, flags=2)
+    return matched_image
 
 if __name__ == "__main__":
+    image = cv2.imread('./rng2img/Hash Images/esgtsa_linear.png')
 
-    if len(sys.argv) != 2:
-        usage()
-        exit()
-
-    image = cv2.imread(sys.argv[1])
-    image = BRISK(image)
-    cv2.imwrite('BRISK_out.png', image) 
+    if image is None:
+        print("Error: Image did not load.")
+    else:
+        image = BRISK(image)
+        plt.imshow(image),plt.show()

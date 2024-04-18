@@ -14,18 +14,18 @@ def ransac(matches, kp1, kp2, iter=100, thres=5):
         pt2 = kp2[match.trainIdx].pt
         tx, ty = (pt2[0] - pt1[0]), (pt2[1] - pt1[1])
 
-        # test and evaluate coordinates
-        inliers = []
-        for match in matches:
-            pt1 = kp1[match.queryIdx].pt
-            pt2 = kp2[match.trainIdx].pt
-            est_pt2 = (pt1[0] + tx, pt1[1] + ty)
-            error = np.linalg.norm(np.array(est_pt2) - np.array(pt2))
-
-            if error < thres:
-                inliers.append(True)
-            else:
-                inliers.append(False)
+        """
+        This part compares keypoints within the same image, translated by a vector (tx,ty),
+        against their original positions in that same image to determine if they qualify
+        as inliers based on a distance threshold.
+        """
+        inliers = [
+            np.linalg.norm(
+                np.array((kp1[match.queryIdx].pt[0] + tx, kp1[match.queryIdx].pt[1] + ty))
+                -
+                np.array(kp2[match.trainIdx].pt)) < thres
+            for match in matches
+        ]
 
         # update model variables
         num_inliers = np.sum(inliers)

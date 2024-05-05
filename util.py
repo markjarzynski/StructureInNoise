@@ -21,7 +21,6 @@ def get_color(seed):
 
 
 def draw_matches(image, matches, keypoints):
-
     for idx, match in enumerate(matches):
         for m in match:
             pt1 = tuple(int(i) for i in keypoints[m.queryIdx].pt)

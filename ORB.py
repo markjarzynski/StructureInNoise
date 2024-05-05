@@ -17,9 +17,9 @@ def ORB(image):
     matches = bf.knnMatch(descriptors, descriptors, k=2)
     matches = [match for (_, match) in matches]
 
-    filtered_matches = filter_distance(matches, keypoints, 5)
+    matches = filter_distance(matches, keypoints, 5)
 
-    _, _, filtered_matches = ransac(filtered_matches, keypoints, keypoints)
+    _, _, filtered_matches = ransac(matches, keypoints, keypoints)
 
     group = [filtered_matches]
     m = matches

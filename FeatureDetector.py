@@ -6,6 +6,7 @@ from RANSAC import ransac
 from util import *
 
 DEBUGGING = True
+RANSAC_LOOP_MAX = 40
 
 class FeatureDetector():
 
@@ -27,7 +28,7 @@ class FeatureDetector():
 		detector = self.technique()
 
 		self.kpts, descriptors = detector.detectAndCompute(gray, None)
-		
+
 		bf = cv2.BFMatcher(norm_type, crossCheck=False)
 		matches = bf.knnMatch(descriptors, descriptors, k=2)
 		self.matches = [match for (_, match) in matches]
@@ -40,15 +41,18 @@ class FeatureDetector():
 		self.group = [filtered_matches]
 		m = list(self.matches)
 
-		while True:
+		remainging = RANSAC_LOOP_MAX
+
+		while True and remainging:
 			m = filter_matches(m, filtered_matches)
 			_, _, filtered_matches = ransac(m, self.kpts, self.kpts)
 
+			print(len(filtered_matches))
 			if len(filtered_matches) > 2:
 				self.group.append(filtered_matches)
 			else:
 				break
-
+			remainging -= 1
 
         # debugging
 		if DEBUGGING:

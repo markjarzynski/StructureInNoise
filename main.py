@@ -22,16 +22,16 @@ if __name__ == "__main__":
 
     image = cv2.imread(sys.argv[1])
 
-    freak = FREAKClass(image)
-    freak.runTest()
+    #freak = FREAKClass(image)
+    #freak.runTest()
 
     sift = SIFTClass(image)
     sift.runTest()
 
-    orb_image = ORBClass(image)
+    orb = ORBClass(image)
     orb.runTest()
 
-    brisk = BRISKClass()
+    brisk = BRISKClass(image)
     brisk.runTest()
 
     #sift_image = SIFT(image)

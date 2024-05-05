@@ -1,6 +1,27 @@
 import cv2
 import matplotlib.pyplot as plt
 
+
+from FeatureDetector import FeatureDetector
+
+class SIFTClass(FeatureDetector):
+    
+    def __init__(self, img):
+        super().__init__(img, cv2.SIFT_create)
+        self.norm_type = cv2.NORM_L1
+
+    def runTest(self):
+        self.extractFeatures(self.norm_type)
+
+        out_image = self.drawMatches()
+        plt.imshow(out_image)
+        plt.show()
+
+        self.computeGroups()
+        out_image = self.drawGroupMatches()
+        plt.imshow(out_image)
+        plt.show()
+
 def SIFT(image):
     img1 = image.copy()
     img2 = image.copy()

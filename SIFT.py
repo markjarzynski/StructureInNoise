@@ -1,5 +1,7 @@
+#!/usr/bin/env python
 import cv2
 import matplotlib.pyplot as plt
+import sys
 
 
 from FeatureDetector import FeatureDetector
@@ -31,7 +33,16 @@ def SIFT(image):
 
     return img3
 
+def usage():
+    print(f"Usage: {sys.argv[0]} <image>")
+
 if __name__ == "__main__":
-    image = cv2.imread('./rng2img/city.png')
-    image = SIFT(image)
-    plt.imshow(image),plt.show()
+
+    if len(sys.argv) != 2:
+        usage()
+        exit()
+
+    image = cv2.imread(sys.argv[1])
+
+    sift = SIFTClass(image)
+    sift.runTest()

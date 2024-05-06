@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 import cv2
 import matplotlib.pyplot as plt
@@ -7,7 +8,8 @@ from FeatureDetector import FeatureDetector
 class BRISKClass(FeatureDetector):
     
     def __init__(self, img):
-        super().__init__(img, cv2.BRISK_create, cv2.NORM_HAMMING)
+        super().__init__(img, cv2.BRISK_create)
+        self.norm_type = cv2.NORM_HAMMING
         self.iter = 500
 
 
@@ -35,7 +37,7 @@ def BRISK(image):
     plt.imshow(image),plt.show()
 
 def usage():
-    print("Usage: ./main.py <image>")
+    print(f"Usage: {sys.argv[0]} <image>")
 
 if __name__ == "__main__":
 
@@ -44,5 +46,8 @@ if __name__ == "__main__":
         exit()
 
     image = cv2.imread(sys.argv[1])
-    image = BRISK(image)
-    cv2.imwrite('BRISK_out.png', image) 
+
+    brisk = BRISKClass(image)
+    brisk.runTest()
+    #image = BRISK(image)
+    #cv2.imwrite('BRISK_out.png', image) 

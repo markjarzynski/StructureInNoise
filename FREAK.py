@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 import cv2
 import matplotlib.pyplot as plt
@@ -8,10 +9,12 @@ from util import *
 class FREAKClass(FeatureDetector):
 
     def __init__(self, img):
-        super().__init__(img, cv2.xfeatures2d.FREAK_create, cv2.NORM_L1)
+        super().__init__(img, cv2.xfeatures2d.FREAK_create)
+        self.norm_type = cv2.NORM_L1
         self.iter = 500
 
-    def extractFeatures(self, norm_type=cv2.NORM_L1):
+    def extractFeatures(self):
+
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         
         fast = cv2.FastFeatureDetector_create()
@@ -20,7 +23,7 @@ class FREAKClass(FeatureDetector):
         kpts = fast.detect(gray, None)
         self.kpts, descriptors = detector.compute(gray, kpts)
         
-        bf = cv2.BFMatcher(norm_type, crossCheck=False)
+        bf = cv2.BFMatcher(self.norm_type, crossCheck=False)
         matches = bf.knnMatch(descriptors, descriptors, k=2)
         self.matches = [match for (_, match) in matches]
         self.matches = filter_distance(self.matches, self.kpts, 5)
@@ -54,7 +57,7 @@ def FREAK(image):
     plt.imshow(image),plt.show()
 
 def usage():
-    print("Usage: ./main.py <image>")
+    print(f"Usage: {sys.argv[0]} <image>")
 
 if __name__ == "__main__":
 
@@ -63,5 +66,9 @@ if __name__ == "__main__":
         exit()
 
     image = cv2.imread(sys.argv[1])
-    image = FREAK(image)
-    cv2.imwrite('FREAK_out.png', image) 
+
+    freak = FREAKClass(image)
+    freak.run()
+
+    #image = FREAK(image)
+    #cv2.imwrite('FREAK_out.png', image) 

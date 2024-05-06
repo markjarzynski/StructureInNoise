@@ -12,7 +12,7 @@ from FREAK import FREAKClass
 from FeatureDetector import FeatureDetector
 
 def usage():
-    print("Usage: ./main.py <image>")
+    print(f"Usage: {sys.argv[0]} <image>")
 
 if __name__ == "__main__":
 

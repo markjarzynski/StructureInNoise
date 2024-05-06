@@ -99,7 +99,8 @@ class FeatureDetector():
             pt1 = tuple(int(i) for i in self.kpts[match.queryIdx].pt)
             pt2 = tuple(int(i) for i in self.kpts[match.trainIdx].pt)
 
-            image = cv2.line(self.img, pt1, pt2, color=get_color(idx))
+            image = cv2.line(self.img, pt1, pt2, color=(0,0,0), thickness=4, lineType=cv2.LINE_AA)
+            image = cv2.line(image, pt1, pt2, color=get_color(idx), thickness=2, lineType=cv2.LINE_AA)
 
         return image
     

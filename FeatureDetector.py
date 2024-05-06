@@ -118,3 +118,12 @@ class FeatureDetector():
 
     def printGroup(self):
         print(self.name, "Group:", ",".join([str(len(i)) for i in self.group]))
+
+    def writeFirstImage(self, filename=None):
+        if not filename:
+            filename = f'{self.name}_out.png'
+
+        try:
+            cv2.imwrite(filename, self.drawFirst())
+        except cv2.error:
+            print("Unable to output image with no matches")

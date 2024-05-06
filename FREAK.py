@@ -50,6 +50,4 @@ if __name__ == "__main__":
 
     freak.printFirst()
 
-
-    #image = FREAK(image)
-    #cv2.imwrite('FREAK_out.png', image) 
+    freak.writeFirstImage()

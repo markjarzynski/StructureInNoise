@@ -7,20 +7,8 @@ from FeatureDetector import FeatureDetector
 class BRISKClass(FeatureDetector):
     
     def __init__(self, img):
-        super().__init__(img, cv2.BRISK_create)
-        self.norm_type = cv2.NORM_HAMMING
-
-    def runTest(self):
-        self.extractFeatures(self.norm_type)
-
-        out_image = self.drawMatches()
-        plt.imshow(out_image)
-        plt.show()
-
-        self.computeGroups()
-        out_image = self.drawGroupMatches()
-        plt.imshow(out_image)
-        plt.show()
+        super().__init__(img, cv2.BRISK_create, cv2.NORM_HAMMING)
+        self.iter = 500
 
 
 def BRISK(image):

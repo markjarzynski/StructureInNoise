@@ -5,8 +5,8 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
-from ORB import ORB, ORBClass
-from SIFT import SIFT, SIFTClass
+from ORB import ORBClass
+from SIFT import SIFTClass
 from BRISK import BRISKClass
 from FREAK import FREAKClass
 from FeatureDetector import FeatureDetector
@@ -22,31 +22,22 @@ if __name__ == "__main__":
 
     image = cv2.imread(sys.argv[1])
 
-    #freak = FREAKClass(image)
-    #freak.runTest()
+    if image is None:
+        print("Error: Image did not load.")
+        exit()
 
     sift = SIFTClass(image)
-    sift.runTest()
+    sift.run()
+    sift.printFirst()
 
     orb = ORBClass(image)
-    orb.runTest()
+    orb.run()
+    orb.printFirst()
 
     brisk = BRISKClass(image)
-    brisk.runTest()
+    brisk.run()
+    brisk.printFirst()
 
-    #sift_image = SIFT(image)
-    # orb.extractFeatures(norm_type=cv2.NORM_HAMMING)
-
-    # orb_image = orb.drawMatches()
-    # plt.imshow(orb_image)
-    # plt.show()
-
-    # #orb.computeGroups()
-    # #orb_image = orb.drawGroupMatches()
-    # plt.imshow(orb_image)
-    # plt.show()
-
-
-    #freak_image = FREAK(image)
-
-    
+    freak = FREAKClass(image)
+    freak.run()
+    freak.printFirst()

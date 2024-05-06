@@ -13,6 +13,7 @@ class ORBClass(FeatureDetector):
     def __init__(self, img):
         super().__init__(img, cv2.ORB_create)
         self.norm_type = cv2.NORM_HAMMING
+        self.name = "ORB"
 
 
 def ORB(image):
@@ -71,7 +72,10 @@ if __name__ == "__main__":
         exit()
 
     orb = ORBClass(image)
-    orb.runTest()    
+    orb.run()
+    orb.computeGroup()
+    
+    orb.printGroup()
 
     #image = ORB(image)
     #plt.imshow(image),plt.show()

@@ -11,7 +11,7 @@ class BRISKClass(FeatureDetector):
         super().__init__(img, cv2.BRISK_create)
         self.norm_type = cv2.NORM_HAMMING
         self.iter = 500
-
+        self.name = 'BRISK'
 
 def BRISK(image):
     img1 = image.copy()
@@ -47,7 +47,12 @@ if __name__ == "__main__":
 
     image = cv2.imread(sys.argv[1])
 
+    if image is None:
+        print("Error: Image did not load.")
+        exit()
+
     brisk = BRISKClass(image)
-    brisk.runTest()
-    #image = BRISK(image)
-    #cv2.imwrite('BRISK_out.png', image) 
+    brisk.run()
+
+    brisk.printFirst()
+    cv2.imwrite('BRISK_out.png', brisk.drawFirst())

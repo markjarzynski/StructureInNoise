@@ -23,6 +23,8 @@ class FeatureDetector():
         self.kpts = None
         self.iter = 100
         self.norm_type=cv2.NORM_L1
+        self.name = None
+
 
     def extractFeatures(self):
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
@@ -95,3 +97,8 @@ class FeatureDetector():
 
         return image
 
+    def printFirst(self):
+        print(f"{self.name}: {len(self.first)}")
+
+    def printGroup(self):
+        print(self.name, "Group:", ",".join([str(len(i)) for i in self.group]))

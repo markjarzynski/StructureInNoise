@@ -10,6 +10,7 @@ class BRISKClass(FeatureDetector):
     def __init__(self, img):
         super().__init__(img, cv2.BRISK_create)
         self.norm_type = cv2.NORM_HAMMING
+        self.name = 'BRISK'
 
 def BRISK(image):
     img1 = image.copy()
@@ -52,5 +53,5 @@ if __name__ == "__main__":
     brisk = BRISKClass(image)
     brisk.run()
 
-    print('BRISK: ', len(brisk.first))
+    brisk.printFirst()
     cv2.imwrite('BRISK_out.png', brisk.drawFirst())

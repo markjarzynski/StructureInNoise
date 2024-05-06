@@ -23,6 +23,7 @@ class FeatureDetector():
         self.group = None
         self.kpts = None
         self.iter = 100
+        self.name = None
 
     def extractFeatures(self, norm_type=cv2.NORM_L1):
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
@@ -39,7 +40,7 @@ class FeatureDetector():
     def computeFirst(self):
         _, _, self.first = ransac(self.matches, self.kpts, self.kpts, self.iter)
 
-    def computeGroups(self):
+    def computeGroup(self):
 
         _, _, filtered_matches = ransac(self.matches, self.kpts, self.kpts, self.iter)
 
@@ -89,3 +90,9 @@ class FeatureDetector():
                 image = cv2.line(self.img, pt1, pt2, color=get_color(idx))
 
         return image
+
+    def printFirst(self):
+        print(f"{self.name}: {len(self.first)}")
+
+    def printGroup(self):
+        print(self.name, "Group:", ",".join([str(len(i)) for i in self.group]))

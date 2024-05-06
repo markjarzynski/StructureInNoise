@@ -10,6 +10,7 @@ class BRISKClass(FeatureDetector):
     def __init__(self, img):
         super().__init__(img, cv2.BRISK_create)
         self.norm_type = cv2.NORM_HAMMING
+        self.iter = 500
         self.name = 'BRISK'
 
 def usage():

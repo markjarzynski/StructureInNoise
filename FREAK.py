@@ -46,6 +46,4 @@ if __name__ == "__main__":
     freak = FREAKClass(image)
     freak.run()
     freak.printFirst()
-
-    #image = FREAK(image)
-    #cv2.imwrite('FREAK_out.png', image) 
+    freak.writeFirstImage()

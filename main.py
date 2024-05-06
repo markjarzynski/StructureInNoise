@@ -17,37 +17,38 @@ def usage():
 
 if __name__ == "__main__":
 
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2:
         usage()
         exit()
 
-    filename = sys.argv[1]
-    image = cv2.imread(filename)
+    print('HASH,SIFT,ORB,BRISK,FREAK')
 
-    if image is None:
-        print("Error: Image did not load.")
-        exit()
+    for filename in sys.argv[1:]:
 
-    basename = os.path.basename(filename)
-    parts = basename.split('.')
-    name = parts[0]
+        image = cv2.imread(filename)
 
-    sift = SIFTClass(image)
-    sift.run()
-    sift.printFirst()
-    sift.writeFirstImage(f'{name}.SIFT.png')
+        if image is None:
+            print("Error: Image did not load.")
+            continue
 
-    orb = ORBClass(image)
-    orb.run()
-    orb.printFirst()
-    orb.writeFirstImage(f'{name}.ORB.png')
+        basename = os.path.basename(filename)
+        parts = basename.split('.')
+        name = parts[0]
 
-    brisk = BRISKClass(image)
-    brisk.run()
-    brisk.printFirst()
-    brisk.writeFirstImage(f'{name}.BRISK.png')
+        sift = SIFTClass(image)
+        sift.run()
+        sift.writeFirstImage(f'{name}.SIFT.png')
 
-    freak = FREAKClass(image)
-    freak.run()
-    freak.printFirst()
-    freak.writeFirstImage(f'{name}.FREAK.png')
+        orb = ORBClass(image)
+        orb.run()
+        orb.writeFirstImage(f'{name}.ORB.png')
+
+        brisk = BRISKClass(image)
+        brisk.run()
+        brisk.writeFirstImage(f'{name}.BRISK.png')
+
+        freak = FREAKClass(image)
+        freak.run()
+        freak.writeFirstImage(f'{name}.FREAK.png')
+
+        print(f'{name},{len(sift.first)},{len(orb.first)},{len(brisk.first)},{len(freak.first)}')

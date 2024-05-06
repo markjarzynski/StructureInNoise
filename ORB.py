@@ -15,6 +15,7 @@ class ORBClass(FeatureDetector):
         self.norm_type = cv2.NORM_HAMMING
         self.name = "ORB"
 
+
 def usage():
     print(f"Usage: {sys.argv[0]} <image>")
 
@@ -34,4 +35,4 @@ if __name__ == "__main__":
     orb.run()
     
     orb.printFirst()
-    orb.writeFristImage()
+    orb.writeFirstImage()

@@ -9,7 +9,6 @@ DEBUGGING = True
 RANSAC_LOOP_MAX = 40
 
 class FeatureDetector():
-
     '''
         Initialize a FeatureDetector object with inputs of
         img - Image to detect features within
@@ -23,28 +22,50 @@ class FeatureDetector():
         self.group = None
         self.kpts = None
         self.iter = 100
+        self.norm_type=cv2.NORM_L1
         self.name = None
 
-    def extractFeatures(self, norm_type=cv2.NORM_L1):
+
+    def extractFeatures(self):
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         
         detector = self.technique()
 
         self.kpts, descriptors = detector.detectAndCompute(gray, None)
 
-        bf = cv2.BFMatcher(norm_type, crossCheck=False)
+        bf = cv2.BFMatcher(self.norm_type, crossCheck=False)
         matches = bf.knnMatch(descriptors, descriptors, k=2)
-        self.matches = [match for (_, match) in matches]
-        self.matches = filter_distance(self.matches, self.kpts, 5)
+
+        try:
+        	self.matches = [match for (_, match) in matches]
+        	self.matches = filter_distance(self.matches, self.kpts, 5)
+        except ValueError:
+        	return False
 
     def computeFirst(self):
+        if 0 == len(self.matches):
+            if DEBUGGING:
+                print("No matches found, can't compute group")
+            self.first = []
+            return False
+
         _, _, self.first = ransac(self.matches, self.kpts, self.kpts, self.iter)
+        self.group = [self.first]
 
     def computeGroup(self):
 
+        if 0 == len(self.matches):
+            if DEBUGGING:
+                print("No matches found, can't compute group")
+            return False
+
         _, _, filtered_matches = ransac(self.matches, self.kpts, self.kpts, self.iter)
 
-        self.group = [filtered_matches]
+        try:
+	        self.group.append(filter_matches)
+        except NameError:
+        	self.group = [filtered_matches]
+
         m = list(self.matches)
 
         remainging = RANSAC_LOOP_MAX
@@ -69,10 +90,11 @@ class FeatureDetector():
             print("Group sizes:", ",".join([str(len(i)) for i in self.group]))
 
     def run(self):
-        self.extractFeatures(self.norm_type)
+        self.extractFeatures()
         self.computeFirst()
 
     def drawFirst(self):
+        image = None
         for idx, match in enumerate(self.first):
             pt1 = tuple(int(i) for i in self.kpts[match.queryIdx].pt)
             pt2 = tuple(int(i) for i in self.kpts[match.trainIdx].pt)
@@ -102,4 +124,7 @@ class FeatureDetector():
         if not filename:
             filename = f'{self.name}_out.png'
 
-        cv2.imwrite(filename, self.drawFirst())
+        try:
+            cv2.imwrite(filename, self.drawFirst())
+        except cv2.error:
+            print("Unable to output image with no matches")

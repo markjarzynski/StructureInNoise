@@ -14,7 +14,8 @@ class FREAKClass(FeatureDetector):
         self.iter = 500
         self.name = "FREAK"
 
-    def extractFeatures(self, norm_type=cv2.NORM_L1):
+    def extractFeatures(self):
+
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         
         fast = cv2.FastFeatureDetector_create()
@@ -23,10 +24,11 @@ class FREAKClass(FeatureDetector):
         kpts = fast.detect(gray, None)
         self.kpts, descriptors = detector.compute(gray, kpts)
         
-        bf = cv2.BFMatcher(norm_type, crossCheck=False)
+        bf = cv2.BFMatcher(self.norm_type, crossCheck=False)
         matches = bf.knnMatch(descriptors, descriptors, k=2)
         self.matches = [match for (_, match) in matches]
         self.matches = filter_distance(self.matches, self.kpts, 5)
+
 
 def usage():
     print(f"Usage: {sys.argv[0]} <image>")
@@ -45,5 +47,7 @@ if __name__ == "__main__":
 
     freak = FREAKClass(image)
     freak.run()
+
     freak.printFirst()
+
     freak.writeFirstImage()

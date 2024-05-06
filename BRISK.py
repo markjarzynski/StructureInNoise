@@ -32,4 +32,5 @@ if __name__ == "__main__":
     brisk.run()
 
     brisk.printFirst()
+
     brisk.writeFirstImage()

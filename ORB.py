@@ -68,13 +68,13 @@ def ORB(image):
 
     return matched_image
 
-def usage(program):
-    print(f"Usage: {program} <image>")
+def usage():
+    print(f"Usage: {sys.argv[0]} <image>")
 
 if __name__ == "__main__":
 
     if len(sys.argv) != 2:
-        usage(sys.argv[0])
+        usage()
         exit()
 
     image = cv2.imread(sys.argv[1])
@@ -83,5 +83,8 @@ if __name__ == "__main__":
         print("Error: Image did not load.")
         exit()
 
-    image = ORB(image)
-    plt.imshow(image),plt.show()
+    orb = ORBClass(image)
+    orb.runTest()    
+
+    #image = ORB(image)
+    #plt.imshow(image),plt.show()

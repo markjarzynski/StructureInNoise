@@ -10,60 +10,82 @@ RANSAC_LOOP_MAX = 40
 
 class FeatureDetector():
 
-	'''
-		Initialize a FeatureDetector object with inputs of
-		img - Image to detect features within
-		technique - Feature matching model
-	'''
-	def __init__(self, img, technique):
-		self.img = img.copy()
-		self.technique = technique
-		self.matches = None
-		self.group = None
-		self.kpts = None
+    '''
+        Initialize a FeatureDetector object with inputs of
+        img - Image to detect features within
+        technique - Feature matching model
+    '''
+    def __init__(self, img, technique):
+        self.img = img.copy()
+        self.technique = technique
+        self.matches = None
+        self.first = None
+        self.group = None
+        self.kpts = None
+        self.iter = 100
 
-	def extractFeatures(self, norm_type=cv2.NORM_L1):
-		gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-		
-		detector = self.technique()
+    def extractFeatures(self, norm_type=cv2.NORM_L1):
+        gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+        
+        detector = self.technique()
 
-		self.kpts, descriptors = detector.detectAndCompute(gray, None)
+        self.kpts, descriptors = detector.detectAndCompute(gray, None)
 
-		bf = cv2.BFMatcher(norm_type, crossCheck=False)
-		matches = bf.knnMatch(descriptors, descriptors, k=2)
-		self.matches = [match for (_, match) in matches]
-		self.matches = filter_distance(self.matches, self.kpts, 5)
+        bf = cv2.BFMatcher(norm_type, crossCheck=False)
+        matches = bf.knnMatch(descriptors, descriptors, k=2)
+        self.matches = [match for (_, match) in matches]
+        self.matches = filter_distance(self.matches, self.kpts, 5)
 
-	def computeGroups(self):
+    def computeFirst(self):
+        _, _, self.first = ransac(self.matches, self.kpts, self.kpts, self.iter)
 
-		_, _, filtered_matches = ransac(self.matches, self.kpts, self.kpts)
+    def computeGroups(self):
 
-		self.group = [filtered_matches]
-		m = list(self.matches)
+        _, _, filtered_matches = ransac(self.matches, self.kpts, self.kpts, self.iter)
 
-		remainging = RANSAC_LOOP_MAX
+        self.group = [filtered_matches]
+        m = list(self.matches)
 
-		while True and remainging:
-			m = filter_matches(m, filtered_matches)
-			_, _, filtered_matches = ransac(m, self.kpts, self.kpts)
+        remainging = RANSAC_LOOP_MAX
 
-			print(len(filtered_matches))
-			if len(filtered_matches) > 2:
-				self.group.append(filtered_matches)
-			else:
-				break
-			remainging -= 1
+        while True and remainging:
+            m = filter_matches(m, filtered_matches)
+            _, _, filtered_matches = ransac(m, self.kpts, self.kpts, self.iter)
+
+            print(len(m), len(filtered_matches))
+            if len(filtered_matches) > 2:
+                self.group.append(filtered_matches)
+            else:
+                break
+            remainging -= 1
 
         # debugging
-		if DEBUGGING:
-			print("Total matches found:", len(self.matches))
-			print("Number of keypoints:", len(self.kpts))
-			#print("Number of refined matches:", len(filtered_matches))
-			print("Number of groups:", len(self.group))
-			print("Group sizes:", ",".join([str(len(i)) for i in self.group]))
+        if DEBUGGING:
+            print("Total matches found:", len(self.matches))
+            print("Number of keypoints:", len(self.kpts))
+            #print("Number of refined matches:", len(filtered_matches))
+            print("Number of groups:", len(self.group))
+            print("Group sizes:", ",".join([str(len(i)) for i in self.group]))
 
-	def drawMatches(self):
-		return cv2.drawMatches(self.img, self.kpts, self.img, self.kpts, self.matches[:30], None, flags=2)
-	
-	def drawGroupMatches(self):
-		return draw_matches(self.img, self.group, self.kpts)
+    def run(self):
+        self.extractFeatures(self.norm_type)
+        self.computeFirst()
+
+    def drawFirst(self):
+        for idx, match in enumerate(self.first):
+            pt1 = tuple(int(i) for i in self.kpts[match.queryIdx].pt)
+            pt2 = tuple(int(i) for i in self.kpts[match.trainIdx].pt)
+
+            image = cv2.line(self.img, pt1, pt2, color=get_color(idx))
+
+        return image
+    
+    def drawGroupMatches(self):
+        for idx, matches in enumerate(self.group):
+            for match in matches:
+                pt1 = tuple(int(i) for i in keypoints[match.queryIdx].pt)
+                pt2 = tuple(int(i) for i in keypoints[match.trainIdx].pt)
+
+                image = cv2.line(self.img, pt1, pt2, color=get_color(idx))
+
+        return image

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 import cv2
 import matplotlib.pyplot as plt
@@ -10,6 +11,7 @@ class FREAKClass(FeatureDetector):
     def __init__(self, img):
         super().__init__(img, cv2.xfeatures2d.FREAK_create)
         self.norm_type = cv2.NORM_L1
+        self.iter = 500
 
     def extractFeatures(self, norm_type=cv2.NORM_L1):
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
@@ -27,15 +29,17 @@ class FREAKClass(FeatureDetector):
 
     def runTest(self):
         self.extractFeatures(self.norm_type)
+        self.computeFirst()
 
-        out_image = self.drawMatches()
+        out_image = self.drawFirst()
+        print(len(self.first))
         plt.imshow(out_image)
         plt.show()
 
-        self.computeGroups()
-        out_image = self.drawGroupMatches()
-        plt.imshow(out_image)
-        plt.show()
+        #self.computeGroups()
+        #out_image = self.drawGroupMatches()
+        #plt.imshow(out_image)
+        #plt.show()
 
 
 def FREAK(image):
@@ -66,7 +70,7 @@ def FREAK(image):
     plt.imshow(image),plt.show()
 
 def usage():
-    print("Usage: ./main.py <image>")
+    print(f"Usage: {sys.argv[0]} <image>")
 
 if __name__ == "__main__":
 
@@ -75,5 +79,9 @@ if __name__ == "__main__":
         exit()
 
     image = cv2.imread(sys.argv[1])
-    image = FREAK(image)
-    cv2.imwrite('FREAK_out.png', image) 
+
+    freak = FREAKClass(image)
+    freak.runTest()
+
+    #image = FREAK(image)
+    #cv2.imwrite('FREAK_out.png', image) 

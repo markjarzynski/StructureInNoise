@@ -33,16 +33,31 @@ class FeatureDetector():
 
         self.kpts, descriptors = detector.detectAndCompute(gray, None)
 
-        bf = cv2.BFMatcher(norm_type, crossCheck=False)
+        bf = cv2.BFMatcher(self.norm_type, crossCheck=False)
         matches = bf.knnMatch(descriptors, descriptors, k=2)
-        self.matches = [match for (_, match) in matches]
-        self.matches = filter_distance(self.matches, self.kpts, 5)
+
+        try:
+        	self.matches = [match for (_, match) in matches]
+        	self.matches = filter_distance(self.matches, self.kpts, 5)
+        except ValueError:
+        	return False
 
     def computeFirst(self):
+        if 0 == len(self.matches):
+            if DEBUGGING:
+                print("No matches found, can't compute group")
+            self.first = []
+            return False
+
         _, _, self.first = ransac(self.matches, self.kpts, self.kpts, self.iter)
         self.group = [self.first]
 
     def computeGroup(self):
+
+        if 0 == len(self.matches):
+            if DEBUGGING:
+                print("No matches found, can't compute group")
+            return False
 
         _, _, filtered_matches = ransac(self.matches, self.kpts, self.kpts, self.iter)
 
@@ -79,6 +94,7 @@ class FeatureDetector():
         self.computeFirst()
 
     def drawFirst(self):
+        image = None
         for idx, match in enumerate(self.first):
             pt1 = tuple(int(i) for i in self.kpts[match.queryIdx].pt)
             pt2 = tuple(int(i) for i in self.kpts[match.trainIdx].pt)

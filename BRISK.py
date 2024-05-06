@@ -55,4 +55,9 @@ if __name__ == "__main__":
     brisk.run()
 
     brisk.printFirst()
-    cv2.imwrite('BRISK_out.png', brisk.drawFirst())
+    firstOutImage = brisk.drawFirst()
+    try:
+        cv2.imwrite('BRISK_out.png', firstOutImage)
+
+    except cv2.error:
+        print("Unable to output image with no matches")

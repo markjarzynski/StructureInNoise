@@ -67,20 +67,61 @@ uint3 hash2rgb(char* hashname, uint x, uint y)
     else if (strcmp(hashname, #HASH "_linear") == 0) \
     {                                       \
         uint h = HASH(seed(uint2(x,y)));    \
-        return uint3(h,h,h);                \
+        return uint3(h, h, h);              \
     }                                       \
     else if (strcmp(hashname, #HASH "_nested") == 0) \
     {                                       \
         uint h = HASH(HASH(x) + y);         \
-        return uint3(h,h,h);                \
+        return uint3(h, h, h);              \
     }
-
 
 #define ELSEIF12(HASH)                      \
     else if (strcmp(hashname, #HASH) == 0)  \
     {                                       \
         uint h = HASH(uint2(x,y));          \
-        return uint3(h,h,h);                \
+        return uint3(h, h, h);              \
+    }
+
+#define ELSEIF13(HASH)                      \
+    else if (strcmp(hashname, #HASH) == 0)  \
+    {                                       \
+        uint h = HASH(uint3(x, y, 0u));     \
+        return uint3(h, h, h);              \
+    }
+
+#define ELSEIF14(HASH)                      \
+    else if (strcmp(hashname, #HASH) == 0)  \
+    {                                       \
+        uint h = HASH(uint4(x, y, 0u, 0u)); \
+        return uint3(h, h, h);              \
+    }
+
+#define ELSEIF22(HASH)                      \
+    else if (strcmp(hashname, #HASH) == 0)  \
+    {                                       \
+        uint2 h = HASH(uint2(x, y));        \
+        return uint3(h.x, h.y, 0u);         \
+    }
+
+#define ELSEIF23(HASH)                      \
+    else if (strcmp(hashname, #HASH) == 0)  \
+    {                                       \
+        uint2 h = HASH(uint3(x, y, 0u));    \
+        return uint3(h.x, h.y, 0u);         \
+    }
+
+#define ELSEIF24(HASH)                      \
+    else if (strcmp(hashname, #HASH) == 0)  \
+    {                                       \
+        uint2 h = HASH(uint4(x, y, 0u, 0u));\
+        return uint3(h.x, h.y, 0);          \
+    }
+
+#define ELSEIF32(HASH)                      \
+    else if (strcmp(hashname, #HASH) == 0)  \
+    {                                       \
+        uint3 h = HASH(uint2(x, y));        \
+        return h;                           \
     }
 
 #define ELSEIF33(HASH)                      \
@@ -90,18 +131,32 @@ uint3 hash2rgb(char* hashname, uint x, uint y)
         return h;                           \
     }
 
+#define ELSEIF34(HASH)                      \
+    else if (strcmp(hashname, #HASH) == 0)  \
+    {                                       \
+        uint3 h = HASH(uint4(x, y, 0u, 0u));\
+        return uint3(h.x, h.y, h.z);        \
+    }
+
+#define ELSEIF42(HASH)                      \
+    else if (strcmp(hashname, #HASH) == 0)  \
+    {                                       \
+        uint4 h = HASH(uint2(x, y));        \
+        return uint3(h.x, h.y, h.z);        \
+    }
+
+#define ELSEIF43(HASH)                      \
+    else if (strcmp(hashname, #HASH) == 0)  \
+    {                                       \
+        uint4 h = HASH(uint3(x, y, 0u));    \
+        return uint3(h.x, h.y, h.z);        \
+    }
+
 #define ELSEIF44(HASH)                      \
     else if (strcmp(hashname, #HASH) == 0)  \
     {                                       \
         uint4 h = HASH(uint4(x, y, 0u, 0u));\
         return uint3(h.x, h.y, h.z);        \
-    }
-
-#define ELSEIF14(HASH)                      \
-    else if (strcmp(hashname, #HASH) == 0)  \
-    {                                       \
-        uint h = HASH(uint4(x, y, 0u, 0u)); \
-        return uint3(h, h, h);              \
     }
 
 
@@ -152,6 +207,16 @@ uint3 hash2rgb(char* hashname, uint x, uint y)
     }
 
 #undef ELSEIF11
-#undef ELSEIF21
+#undef ELSEIF12
+#undef ELSEIF13
+#undef ELSEIF14
+#undef ELSEIF22
+#undef ELSEIF23
+#undef ELSEIF24
+#undef ELSEIF32
 #undef ELSEIF33
+#undef ELSEIF34
+#undef ELSEIF42
+#undef ELSEIF43
+#undef ELSEIF44
 }

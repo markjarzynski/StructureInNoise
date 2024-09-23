@@ -1,20 +1,49 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "random.h"
 
 #define SIZE 256
+#define SIZE2 (SIZE*SIZE)
 
 int usage();
 
-uint3 hash2rgb(char* hashnamei, uint x, uint y);
-
+uint3 hash2rgb(char* hashname, uint x, uint y);
 
 int main(int argc, char** argv)
 {
 
-    if (argc != 2)
+    if (argc < 2)
         return usage();
 
-    char* hashname = argv[1];
+    int fflag = 0;
+    char* filename = NULL;
+    unsigned char buffer[SIZE2];
+    char* hashname = NULL;
+    int c;
+        
+    while ((c = getopt(argc, argv, "f:")) != -1)
+    {
+        switch (c)
+        {
+        case 'f':
+            fflag = 1;
+            filename = optarg;
+            break;
+        }
+    }
+
+    if (fflag)
+    {
+        FILE* f = fopen(filename, "rb");
+        fread(buffer, sizeof(buffer), 1, f);
+        hashname = filename;
+        fclose(f);
+    }
+    else
+    {
+        hashname = argv[1];
+    }
 
 
     uint8_t (*pixels)[3] = new uint8_t[SIZE*SIZE][3];
@@ -23,24 +52,35 @@ int main(int argc, char** argv)
     {
         for (uint j = 0; j < SIZE; j++)
         {
-            uint3 v = hash2rgb(hashname, i, j);
+            if (fflag)
+            {
+                char c = buffer[j * SIZE + i];
 
-            float scale = 1.f / (float)0xffffffffu;
-            float3 f = v * float3(scale);
+                (*pixel)[0] = c;
+                (*pixel)[1] = c;
+                (*pixel)[2] = c;
+            }
+            else
+            {
+                uint3 v = hash2rgb(hashname, i, j);
 
-            (*pixel)[0] = uint8_t(f.x * 255u);
-            (*pixel)[1] = uint8_t(f.y * 255u);
-            (*pixel)[2] = uint8_t(f.z * 255u);
+                float scale = 1.f / (float)0xffffffffu;
+                float3 f = v * float3(scale);
+
+                (*pixel)[0] = uint8_t(f.x * 255u);
+                (*pixel)[1] = uint8_t(f.y * 255u);
+                (*pixel)[2] = uint8_t(f.z * 255u);
+            };
 
             pixel++;
         }
     }
 
-    char filename[255];
-    strncpy(filename, hashname, 250);
-    strncat(filename, ".ppm", 254);
+    char outname[255];
+    strncpy(outname, hashname, 250);
+    strncat(outname, ".ppm", 254);
 
-    FILE* f = fopen(filename, "wb");
+    FILE* f = fopen(outname, "wb");
     fprintf(f, "P6\n%d %d\n%d\n", SIZE, SIZE, 255);
     fwrite(pixels, 1, SIZE*SIZE*3, f);
     fclose(f);
@@ -55,7 +95,7 @@ int main(int argc, char** argv)
 
 int usage()
 {
-    fprintf(stderr, "Usage: rng2img hash\n");
+    fprintf(stderr, "Usage: rng2img [hash]\n");
     return 1;
 }
 

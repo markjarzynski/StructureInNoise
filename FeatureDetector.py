@@ -61,10 +61,7 @@ class FeatureDetector():
 
         _, _, filtered_matches = ransac(self.matches, self.kpts, self.kpts, self.iter)
 
-        try:
-	        self.group.append(filter_matches)
-        except NameError:
-        	self.group = [filtered_matches]
+        self.group = [filtered_matches]
 
         m = list(self.matches)
 

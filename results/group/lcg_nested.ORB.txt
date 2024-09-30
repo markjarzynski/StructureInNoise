@@ -1,0 +1,10 @@
+25 3
+22 3
+19 3
+16 3
+13 2
+Total matches found: 28
+Number of keypoints: 32
+Number of groups: 5
+Group sizes: 3,3,3,3,3
+ORB Group: 3,3,3,3,3

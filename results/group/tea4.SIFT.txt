@@ -1,0 +1,13 @@
+291 4
+287 3
+284 5
+279 3
+276 3
+273 3
+270 3
+267 2
+Total matches found: 297
+Number of keypoints: 304
+Number of groups: 8
+Group sizes: 6,4,3,5,3,3,3,3
+SIFT Group: 6,4,3,5,3,3,3,3

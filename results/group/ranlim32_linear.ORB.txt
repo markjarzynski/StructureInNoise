@@ -1,0 +1,15 @@
+301 72
+229 29
+200 20
+180 7
+173 4
+169 3
+166 3
+163 3
+160 3
+157 2
+Total matches found: 377
+Number of keypoints: 448
+Number of groups: 10
+Group sizes: 76,72,29,20,7,4,3,3,3,3
+ORB Group: 76,72,29,20,7,4,3,3,3,3

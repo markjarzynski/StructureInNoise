@@ -1,0 +1,14 @@
+333 57
+276 21
+255 21
+234 8
+226 4
+222 3
+219 3
+216 3
+213 2
+Total matches found: 394
+Number of keypoints: 453
+Number of groups: 9
+Group sizes: 61,57,21,21,8,4,3,3,3
+ORB Group: 61,57,21,21,8,4,3,3,3

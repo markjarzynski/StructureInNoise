@@ -1,0 +1,8 @@
+17 3
+14 3
+11 2
+Total matches found: 20
+Number of keypoints: 20
+Number of groups: 3
+Group sizes: 3,3,3
+BRISK Group: 3,3,3

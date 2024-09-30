@@ -1,0 +1,18 @@
+348 4
+344 4
+340 3
+337 3
+334 3
+331 3
+328 3
+325 3
+322 3
+319 3
+316 3
+313 3
+310 2
+Total matches found: 352
+Number of keypoints: 412
+Number of groups: 13
+Group sizes: 4,4,4,3,3,3,3,3,3,3,3,3,3
+ORB Group: 4,4,4,3,3,3,3,3,3,3,3,3,3

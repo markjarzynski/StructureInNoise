@@ -1,0 +1,11 @@
+1479 459
+1020 378
+642 372
+270 62
+208 4
+204 2
+Total matches found: 2876
+Number of keypoints: 4503
+Number of groups: 6
+Group sizes: 1397,459,378,372,62,4
+FREAK Group: 1397,459,378,372,62,4

@@ -1,0 +1,13 @@
+1523 467
+1056 392
+664 369
+295 71
+224 3
+221 3
+218 3
+215 2
+Total matches found: 2970
+Number of keypoints: 4626
+Number of groups: 8
+Group sizes: 1447,467,392,369,71,3,3,3
+FREAK Group: 1447,467,392,369,71,3,3,3

@@ -1,0 +1,7 @@
+219 4
+215 2
+Total matches found: 222
+Number of keypoints: 224
+Number of groups: 2
+Group sizes: 3,4
+SIFT Group: 3,4

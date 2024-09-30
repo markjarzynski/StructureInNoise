@@ -1,0 +1,10 @@
+95 36
+59 27
+32 19
+13 4
+9 1
+Total matches found: 150
+Number of keypoints: 193
+Number of groups: 5
+Group sizes: 55,36,27,19,4
+SIFT Group: 55,36,27,19,4

@@ -1,0 +1,12 @@
+184 66
+118 47
+71 35
+36 8
+28 4
+24 3
+21 2
+Total matches found: 281
+Number of keypoints: 341
+Number of groups: 7
+Group sizes: 97,66,47,35,8,4,3
+SIFT Group: 97,66,47,35,8,4,3

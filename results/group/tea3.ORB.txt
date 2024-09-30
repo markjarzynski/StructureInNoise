@@ -1,0 +1,16 @@
+200 37
+163 16
+147 10
+137 8
+129 7
+122 5
+117 5
+112 4
+108 3
+105 3
+102 2
+Total matches found: 238
+Number of keypoints: 429
+Number of groups: 11
+Group sizes: 38,37,16,10,8,7,5,5,4,3,3
+ORB Group: 38,37,16,10,8,7,5,5,4,3,3

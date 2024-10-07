@@ -49,7 +49,7 @@ class FeatureDetector():
             self.first = []
             return False
 
-        _, _, self.first = ransac(self.matches, self.kpts, self.kpts, self.iter)
+        _, self.first = ransac(self.matches, self.kpts, self.kpts, self.iter)
         self.group = [self.first]
 
     def computeGroup(self):
@@ -59,7 +59,7 @@ class FeatureDetector():
                 print("No matches found, can't compute group")
             return False
 
-        _, _, filtered_matches = ransac(self.matches, self.kpts, self.kpts, self.iter)
+        _, filtered_matches = ransac(self.matches, self.kpts, self.kpts, self.iter)
 
         self.group = [filtered_matches]
 
@@ -69,7 +69,7 @@ class FeatureDetector():
 
         while True and remainging:
             m = filter_matches(m, filtered_matches)
-            _, _, filtered_matches = ransac(m, self.kpts, self.kpts, self.iter)
+            _, filtered_matches = ransac(m, self.kpts, self.kpts, self.iter)
 
             print(len(m), len(filtered_matches))
             if len(filtered_matches) > 2:

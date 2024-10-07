@@ -25,6 +25,10 @@ if __name__ == "__main__":
 
     for filename in sys.argv[1:]:
 
+        basename = os.path.basename(filename)
+        parts = basename.split('.')
+        name = parts[0]
+
         image = cv2.imread(filename)
 
         if image is None:
@@ -35,8 +39,7 @@ if __name__ == "__main__":
         parts = basename.split('.')
         name = parts[0]
 
-        brisk = BRISKClass(image)
+        brisk = BRISKClass(image, name)
         brisk.run()
         brisk.writeFirstImage(f'{name}.BRISK.png')
-
-        print(f'{name},{len(brisk.first)}')
+        brisk.printGroup()

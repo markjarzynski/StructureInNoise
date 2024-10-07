@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from RANSAC import ransac
 from util import *
 
-DEBUGGING = True
-RANSAC_LOOP_MAX = 40
+DEBUGGING = False
+RANSAC_LOOP_MAX = 20
 
 class FeatureDetector():
     '''
@@ -24,6 +24,7 @@ class FeatureDetector():
         self.iter = 100
         self.norm_type=cv2.NORM_L1
         self.name = None
+        self.method = None
 
 
     def extractFeatures(self):
@@ -61,6 +62,7 @@ class FeatureDetector():
 
         _, filtered_matches = ransac(self.matches, self.kpts, self.kpts, self.iter)
 
+        self.first = filtered_matches
         self.group = [filtered_matches]
 
         m = list(self.matches)
@@ -71,7 +73,9 @@ class FeatureDetector():
             m = filter_matches(m, filtered_matches)
             _, filtered_matches = ransac(m, self.kpts, self.kpts, self.iter)
 
-            print(len(m), len(filtered_matches))
+            if DEBUGGING:
+                print(len(m), len(filtered_matches))
+
             if len(filtered_matches) > 2:
                 self.group.append(filtered_matches)
             else:
@@ -88,7 +92,7 @@ class FeatureDetector():
 
     def run(self):
         self.extractFeatures()
-        self.computeFirst()
+        self.computeGroup()
 
     def drawFirst(self):
         image = None
@@ -112,14 +116,14 @@ class FeatureDetector():
         return image
 
     def printFirst(self):
-        print(f"{self.name}: {len(self.first)}")
+        print(f"{self.name} {self.method}: {len(self.first)}")
 
     def printGroup(self):
-        print(self.name, "Group:", ",".join([str(len(i)) for i in self.group]))
+        print(f"{self.name},{self.method}," + ",".join([str(len(i)) for i in self.group]))
 
     def writeFirstImage(self, filename=None):
         if not filename:
-            filename = f'{self.name}_out.png'
+            filename = f'{self.name}.{self.method}.png'
 
         try:
             cv2.imwrite(filename, self.drawFirst())

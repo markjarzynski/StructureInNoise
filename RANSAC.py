@@ -52,8 +52,12 @@ def ransac(matches, kp1, kp2, iter=100, thres=5):
             im2_pts[i] = kp2[match.trainIdx].pt
  
         H, mask = cv2.findHomography(im1_pts, im2_pts, method=cv2.RANSAC)
-     
-        inv_H = np.linalg.inv(H)
+    
+        try: 
+            inv_H = np.linalg.inv(H)
+        except:
+            continue
+
         transformed = [(kp1[match.queryIdx].pt, transform_point(inv_H, kp2[match.trainIdx].pt)) for match in matches]
 
         errorSq = [distanceSq(a,b) for a,b in transformed]

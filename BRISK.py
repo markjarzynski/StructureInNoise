@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import cv2
+import os
 
 from FeatureDetector import FeatureDetector
 
@@ -22,7 +23,7 @@ if __name__ == "__main__":
         usage()
         exit()
 
-    basename = os.path.basename(filename)
+    basename = os.path.basename(sys.argv[1])
     parts = basename.split('.')
     name = parts[0] 
 
@@ -33,7 +34,10 @@ if __name__ == "__main__":
         exit()
 
     brisk = BRISKClass(image, name)
-    brisk.run()
+    #brisk.run()
+    brisk.extractFeatures()
+    brisk.computeFirst()
 
     brisk.printFirst()
-    brisk.writeFirstImage()
+    #brisk.writeFirstImage()
+    brisk.writeMatchedImage()

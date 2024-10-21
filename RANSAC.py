@@ -51,7 +51,12 @@ def ransac(matches, kp1, kp2, iter=100, thres=5):
             im1_pts[i] = kp1[match.queryIdx].pt
             im2_pts[i] = kp2[match.trainIdx].pt
  
-        H, mask = cv2.findHomography(im1_pts, im2_pts, method=cv2.RANSAC)
+        #H, mask = cv2.findHomography(im1_pts, im2_pts, method=cv2.RANSAC)
+        H, mask = cv2.estimateAffine2D(im1_pts, im2_pts, method=cv2.RANSAC)
+        if H is None:
+            continue
+
+        H = np.append(H, [[0, 0, 1]], axis=0)
     
         try: 
             inv_H = np.linalg.inv(H)

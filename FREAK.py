@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
 import cv2
-import matplotlib.pyplot as plt
 
 from FeatureDetector import FeatureDetector
 from util import * 

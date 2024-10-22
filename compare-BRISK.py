@@ -41,4 +41,5 @@ if __name__ == "__main__":
         brisk = BRISKClass(image, name)
         brisk.extractFeatures()
         brisk.computeFirst()
+        #brisk.writeFirstImage()
         brisk.writeMatchedImage()

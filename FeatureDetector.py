@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 
 from RANSAC import ransac
+from RANSAC import transform_point
 from util import *
 
 DEBUGGING = False
@@ -98,13 +99,13 @@ class FeatureDetector():
         self.computeGroup()
 
     def drawFirst(self):
-        image = None
+        image = self.img
         for idx, match in enumerate(self.first):
             pt1 = tuple(int(i) for i in self.kpts[match.queryIdx].pt)
             pt2 = tuple(int(i) for i in self.kpts[match.trainIdx].pt)
 
-            image = cv2.line(self.img, pt1, pt2, color=(0,0,0), thickness=4, lineType=cv2.LINE_AA)
-            image = cv2.line(image, pt1, pt2, color=get_color(idx), thickness=2, lineType=cv2.LINE_AA)
+            image = cv2.line(image, pt1, pt2, color=(0,0,0), thickness=2, lineType=cv2.LINE_AA)
+            image = cv2.line(image, pt1, pt2, color=get_color(idx), thickness=1, lineType=cv2.LINE_AA)
 
         return image
     
@@ -133,7 +134,7 @@ class FeatureDetector():
         except cv2.error:
             print("Unable to output image with no matches")
 
-    def writeMatchedImage(self, filename=None, h=9, w=9):
+    def writeMatchedImage(self, filename=None, h=8, w=8):
         if not filename:
             filename = f'{self.name}.{self.method}.cropped.png'
 
@@ -146,16 +147,47 @@ class FeatureDetector():
 
         output_img = np.zeros(shape=[1, (w + 1) * 3, 3])
 
-        for match in self.matches:
+        H = self.H[0]
+        inv_H = np.linalg.inv(H)
 
+        print(self.img.shape)
+        A = np.matmul(H, np.array([[0], [0], [1]]))
+        B = np.matmul(H, np.array([[0], [self.img.shape[1]], [1]]))
+        C = np.matmul(H, np.array([[self.img.shape[0]], [self.img.shape[1]], [1]]))
+        D = np.matmul(H, np.array([[self.img.shape[0]], [0], [1]]))
+
+        print(A, B, C, D)
+        A = transform_point(inv_H, (0,0))
+        B = transform_point(inv_H, (0,self.img.shape[1]))
+        C = transform_point(inv_H, (self.img.shape[0],0))
+        D = transform_point(inv_H, self.img.shape[:2])
+        print(A, B, C, D)
+
+        min_x = min(min(A[0], B[0]), min(C[0], D[0]))
+        min_y = min(min(A[1], B[1]), min(C[1], D[1]))
+        max_x = max(max(A[0], B[0]), max(C[0], D[0]))
+        max_y = max(max(A[1], B[1]), max(C[1], D[1]))
+
+        print(min_x, min_y, max_x, max_y)
+
+        warped_shape = (int(max_y - min_y), int(max_x - min_x))
+        print(warped_shape)
+        warped_img = cv2.warpAffine(self.img, inv_H[:2], (self.img.shape[1], self.img.shape[0]))
+        #warped_img = cv2.warpAffine(self.img, inv_H[:2], (warped_shape[1], warped_shape[0]))
+
+        h2 = int(h/2)
+        w2 = int(w/2)
+
+        for idx, match in enumerate(self.first):
+            print(idx)
             #match = self.first[0]
             
             pt1 = tuple(int(i) for i in self.kpts[match.queryIdx].pt)
             pt2 = tuple(int(i) for i in self.kpts[match.trainIdx].pt)
 
             # crop the image
-            cropped_img1 = self.img[pt1[1]:pt1[1]+h, pt1[0]:pt1[0]+w]
-            cropped_img2 = self.img[pt2[1]:pt2[1]+h, pt2[0]:pt2[0]+w]
+            cropped_img1 = self.img[(pt1[1]-h2):(pt1[1]+h2), (pt1[0]-w2):(pt1[0]+w2)]
+            cropped_img2 = self.img[(pt2[1]-h2):(pt2[1]+h2), (pt2[0]-w2):(pt2[0]+w2)]
 
             # add seperators
             cropped_img1 = np.concatenate((cropped_img1, seperator_x), axis=1)
@@ -163,39 +195,21 @@ class FeatureDetector():
 
             cropped_img = np.concatenate((cropped_img1, cropped_img2), axis=1)
 
-            H = self.H[0]
-
-            origin = np.matmul(H, np.array([[0], [0], [1]]))
-            large = np.matmul(H, np.array([[256], [256], [1]]))
-            min_x = min(origin[0], large[0])
-            max_x = max(origin[0], large[0])
-            min_y = min(origin[1], large[1])
-            max_y = max(origin[1], large[1])
-
-            shape = (int(max_y - min_y), int(max_x - min_x))
-            print(shape)
             #warped_img = cv2.warpPerspective(self.img, H, shape)
-            warped_img = cv2.warpAffine(self.img, H[:2], shape)
 
-            print("warped img shape: ", warped_img.shape)
-
-            warped_pt = np.matmul(H, np.array([[pt2[0]], [pt2[1]], [1]]))
-            print(warped_pt)
-
-            #warped_pt = [int(warped_pt[0] / warped_pt[2]), int(warped_pt[1] / warped_pt[2])]
+            #warped_pt = np.matmul(H, np.array([[pt2[0]], [pt2[1]], [1]]))
+            warped_pt = transform_point(inv_H, pt2)
+            #warped_pt = [int(warped_pt[0] / warped_pt[2] + 0.5), int(warped_pt[1] / warped_pt[2] + 0.5)]
             warped_pt = [int(warped_pt[0] + 0.5), int(warped_pt[1] + 0.5)]
             print(warped_pt)
 
             if (warped_pt[0] < w or warped_pt[0] > 256 - w or warped_pt[1] < h or warped_pt[1] > 256 - h):
                 continue
 
-            print(warped_pt[1] + h, warped_pt[0] + w)
-            cropped_warped_img = warped_img[warped_pt[1]:warped_pt[1]+h, warped_pt[0]:warped_pt[0]+w]
-            print(cropped_warped_img.shape)
+            cropped_warped_img = warped_img[(warped_pt[1]-h2):(warped_pt[1]+h2), (warped_pt[0]-w2):(warped_pt[0]+w2)]
             cropped_warped_img = np.concatenate((cropped_warped_img, seperator_x), axis=1) 
             
             cropped_img = np.concatenate((cropped_img, cropped_warped_img), axis=1)
-            print(cropped_img.shape, output_img.shape)
         
             cropped_img = np.concatenate((cropped_img, seperator_y), axis=0)
             output_img = np.concatenate((output_img, cropped_img), axis=0)
@@ -205,4 +219,7 @@ class FeatureDetector():
         except:
             print("Unable to output cropped match image.")
 
-
+        try:
+            cv2.imwrite('warped.png', warped_img)
+        except:
+            print("Unable to output warped image.")

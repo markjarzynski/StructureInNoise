@@ -17,10 +17,10 @@ class FeatureDetector():
     def __init__(self, img, technique):
         self.img = img.copy()
         self.technique = technique
-        self.matches = None
-        self.first = None
-        self.group = None
-        self.kpts = None
+        self.matches = []
+        self.first = []
+        self.group = []
+        self.kpts = []
         self.iter = 100
         self.norm_type=cv2.NORM_L1
         self.name = None
@@ -223,3 +223,51 @@ class FeatureDetector():
             cv2.imwrite('warped.png', warped_img)
         except:
             print("Unable to output warped image.")
+
+    def drawHotspotImage(self):
+        img = np.zeros(shape=self.img.shape)
+
+        for group in self.group:
+        
+            l = len(group)
+
+            for match in group:
+                pt1 = tuple(int(i) for i in self.kpts[match.queryIdx].pt)
+                pt2 = tuple(int(i) for i in self.kpts[match.trainIdx].pt)
+
+                img[pt1] = np.add(img[pt1], l)
+                img[pt2] = np.add(img[pt2], l)
+
+        img = np.multiply(img, 0.1)
+
+        return img
+
+    def writeHotspotImage(self, filename=None):
+        if not filename: 
+            filename = f'{self.name}.{self.method}.hotspot.png'
+
+        img = self.drawHotspotImage()
+
+        try:
+            cv2.imwrite(filename, img)
+        except:
+            print("Unable to output hotspot image.")
+
+    def gradeHotspot(self):
+
+        grade = 0
+
+        for group in self.group:
+            
+            l = len(group)
+            grade = grade + 2 * l * l
+
+        shape = self.img.shape
+        pixels = shape[0] * shape[0]
+
+        ratio = grade / pixels
+
+        print(f'{self.name},{grade},{ratio}')
+            
+
+        

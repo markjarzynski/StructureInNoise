@@ -238,7 +238,7 @@ class FeatureDetector():
                 img[pt1] = np.add(img[pt1], l)
                 img[pt2] = np.add(img[pt2], l)
 
-        img = np.multiply(img, 0.1)
+        #img = np.multiply(img, 0.1)
 
         return img
 
@@ -252,6 +252,33 @@ class FeatureDetector():
             cv2.imwrite(filename, img)
         except:
             print("Unable to output hotspot image.")
+    
+    def drawRBImage(self):
+        img = np.zeros(shape=self.img.shape)
+
+        for group in self.group:
+        
+            l = len(group)
+
+            for match in group:
+                pt1 = tuple(int(i) for i in self.kpts[match.queryIdx].pt)
+                pt2 = tuple(int(i) for i in self.kpts[match.trainIdx].pt)
+
+                img[pt1] = np.add(img[pt1], [255,0,0])
+                img[pt2] = np.add(img[pt2], [0,0,255])
+
+        return img
+
+    def writeRBImage(self, filename=None):
+        if not filename: 
+            filename = f'{self.name}.{self.method}.rb.png'
+
+        img = self.drawRBImage()
+
+        try:
+            cv2.imwrite(filename, img)
+        except:
+            print("Unable to output RB image.")
 
     def gradeHotspot(self):
 
@@ -260,7 +287,7 @@ class FeatureDetector():
         for group in self.group:
             
             l = len(group)
-            grade = grade + 2 * l * l
+            grade = grade + l
 
         shape = self.img.shape
         pixels = shape[0] * shape[0]

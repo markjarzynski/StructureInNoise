@@ -264,7 +264,9 @@ class FeatureDetector():
                 pt1 = tuple(int(i) for i in self.kpts[match.queryIdx].pt)
                 pt2 = tuple(int(i) for i in self.kpts[match.trainIdx].pt)
 
+                print(img[pt1])
                 img[pt1] = np.add(img[pt1], [255,0,0])
+                print(img[pt1])
                 img[pt2] = np.add(img[pt2], [0,0,255])
 
         return img

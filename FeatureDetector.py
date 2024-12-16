@@ -52,6 +52,10 @@ class FeatureDetector():
             return False
 
         H, self.first = ransac(self.matches, self.kpts, self.kpts, self.iter)
+
+        if H is None or self.first is None:
+            return
+
         self.group = [self.first]
         self.H = [H]
 
@@ -64,6 +68,9 @@ class FeatureDetector():
 
         H, filtered_matches = ransac(self.matches, self.kpts, self.kpts, self.iter)
 
+        if H is None or filtered_matches is None:
+            return
+
         self.first = filtered_matches
         self.group = [filtered_matches]
         self.H = [H]
@@ -75,6 +82,9 @@ class FeatureDetector():
         while True and remainging:
             m = filter_matches(m, filtered_matches)
             H, filtered_matches = ransac(m, self.kpts, self.kpts, self.iter)
+
+            if H is None or filtered_matches is None:
+                break
 
             if DEBUGGING:
                 print(len(m), len(filtered_matches))

@@ -16,19 +16,25 @@ int main(int argc, char** argv)
     if (argc < 2)
         return usage();
 
-    int fflag = 0;
+    int fflag = 0, bflag = 0, qflag = 0;
     char* filename = NULL;
     unsigned char buffer[SIZE2];
     char* hashname = NULL;
     int c;
         
-    while ((c = getopt(argc, argv, "f:")) != -1)
+    while ((c = getopt(argc, argv, "bqf:")) != -1)
     {
         switch (c)
         {
+        case 'b':
+            bflag = 1;
+            break;
         case 'f':
             fflag = 1;
             filename = optarg;
+            break;
+        case 'q':
+            qflag = 1;
             break;
         }
     }
@@ -42,7 +48,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        hashname = argv[1];
+        hashname = argv[argc - 1];
     }
 
 
@@ -59,6 +65,44 @@ int main(int argc, char** argv)
                 (*pixel)[0] = c;
                 (*pixel)[1] = c;
                 (*pixel)[2] = c;
+            }
+            else if (bflag)
+            {
+                uint x = uint(8.f * (float(i) / float(SIZE)));
+                uint y = uint(4.f * (float(j) / float(SIZE)));
+                uint bit = x + 8u * y;
+
+                uint3 v = hash2rgb(hashname, i, j);
+
+                (*pixel)[0] = uint8_t(((v.x >> bit) & 1u) * 255u);
+                (*pixel)[1] = uint8_t(((v.y >> bit) & 1u) * 255u);
+                (*pixel)[2] = uint8_t(((v.z >> bit) & 1u) * 255u);
+            }
+            else if (qflag)
+            {
+                uint3 v = hash2rgb(hashname, i, j);
+                uint b = 0;
+
+                if (i >= (SIZE >> 1))
+                {
+                    if (j >= (SIZE >> 1))
+                    {
+                        b = 3;
+                    }
+                    else
+                    {
+                        b = 1;
+                    }
+
+                }
+                else if (j >= (SIZE >> 1))
+                {
+                    b = 2;
+                }
+                        
+                (*pixel)[0] = uint8_t((v.x >> (b * 8u)) & 0xff);
+                (*pixel)[1] = uint8_t((v.y >> (b * 8u)) & 0xff);
+                (*pixel)[2] = uint8_t((v.z >> (b * 8u)) & 0xff);
             }
             else
             {

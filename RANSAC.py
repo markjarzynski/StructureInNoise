@@ -10,7 +10,11 @@ def distanceSq(a, b):
     ((x1, y1), (x2, y2)) = a, b
     return (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)
 
-def ransac(matches, kp1, kp2, iter=100, thres=5):
+def ransac(matches, kp1, kp2, iter=100, thres=5, n=4):
+
+    if (len(matches) <= n):
+        #print(f"Not enough matches: {len(matches)} for n: {n}")
+        return None, None
 
     thresSq = thres*thres
 
@@ -43,11 +47,19 @@ def ransac(matches, kp1, kp2, iter=100, thres=5):
             for match in matches
         ]
         """
-        n = 4
         im1_pts = np.zeros(shape=(n, 2))
         im2_pts = np.zeros(shape=(n, 2))
+        rands = []
         for i in range(0, n):
-            match = matches[np.random.randint(0, len(matches))]
+
+            rand = np.random.randint(0, len(matches)) 
+            while rand in rands:
+                rand = np.random.randint(0, len(matches))
+ 
+            rands.append(rand)
+
+            #print(rands, len(matches))
+            match = matches[rand]
             im1_pts[i] = kp1[match.queryIdx].pt
             im2_pts[i] = kp2[match.trainIdx].pt
  

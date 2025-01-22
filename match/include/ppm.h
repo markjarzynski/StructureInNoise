@@ -84,12 +84,12 @@ int read_ppm(char* filename, unsigned char* buffer, int buffer_size)
 
     fpos_t pos;
     // Remove whitespace
-    while ((c = fgetc(file)) != EOF && isspace(c))
+    do
     {
         fgetpos(file, &pos);        
-    }
+    } while ((c = fgetc(file)) != EOF && isspace(c));
 
-    fsetpos(file, &pos - sizeof(char));
+    fsetpos(file, &pos);
 
     size = fread(buffer, sizeof(buffer[0]), width * height * 3, file);
 

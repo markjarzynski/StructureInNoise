@@ -5,7 +5,7 @@
 
 int crop(uint8_t* pixels, int width, int height, uint8_t* kernel, int x, int y, int w, int h)
 {
-    printf("width: %d, height %d\n", width, height);
+    //printf("width: %d, height %d\n", width, height);
     for (int i = 0; i < h; i++)
     {
         for (int j = 0; j < w; j++)
@@ -14,7 +14,7 @@ int crop(uint8_t* pixels, int width, int height, uint8_t* kernel, int x, int y, 
             {
                 int p = 3 * (i * h + j) + k;
                 int q = 3 * (height * (y + i) + x + j) + k;
-                printf("%d, %d: %d, %d\n", p, q, kernel[p], pixels[q]);
+                //printf("%d, %d: %d, %d\n", p, q, kernel[p], pixels[q]);
                 kernel[3 * (i * h + j) + k] = pixels[3 * (height * (y + i) + x + j) + k];
             }
         }

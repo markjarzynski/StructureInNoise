@@ -78,9 +78,9 @@ int read_ppm(char* filename, unsigned char* buffer, int buffer_size)
     max_value = atoi(parse_buffer);
     parse_index = 0;
 
-    printf("P%d\n", version);
-    printf("%d %d\n", width, height);
-    printf("%d\n", max_value);
+    //printf("P%d\n", version);
+    //printf("%d %d\n", width, height);
+    //printf("%d\n", max_value);
 
     fpos_t pos;
     // Remove whitespace
@@ -93,7 +93,7 @@ int read_ppm(char* filename, unsigned char* buffer, int buffer_size)
 
     size = fread(buffer, sizeof(buffer[0]), width * height * 3, file);
 
-    printf("%d\n", size);
+    //printf("%d\n", size);
 
     if (size > buffer_size)
         return 0;
@@ -101,9 +101,11 @@ int read_ppm(char* filename, unsigned char* buffer, int buffer_size)
     if (ferror(file))
         return 0;
 
+    /*
     if (feof(file))
         printf("EOF\n");
-        
+    */
+  
     fclose(file);
 
     return size;

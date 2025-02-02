@@ -9,6 +9,8 @@ int usage(char* name);
 
 int compare(uint8_t* a, uint8_t* b, int w, int h);
 
+int set_pixel(uint8_t* buffer, int width, int height, int x, int y, uint8_t rgb[3]);
+
 int main(int argc, char** argv)
 {
     if (argc < 2)
@@ -17,6 +19,8 @@ int main(int argc, char** argv)
     int height = 256, width = 256;
     int SIZE = height * width * 3;
     uint8_t buffer[SIZE];
+    uint8_t output[SIZE];
+    memset(output, 0, SIZE * sizeof(uint8_t));
 
     read_ppm(argv[1], buffer, SIZE);
 
@@ -25,6 +29,8 @@ int main(int argc, char** argv)
     strncpy(hashname, basename, 256);
     *strrchr(hashname, '.') = '\0';
     
+    uint8_t white[3] = {255u, 255u, 255u};
+
     /*
     for (int i = 0; i < 2 * 3; i += 3)
     {
@@ -59,6 +65,10 @@ int main(int argc, char** argv)
                     {
                        //printf("%d, %d matches %d, %d\n", y, x, i, j);
                        //printf("  (%d, %d, %d) == (%d, %d, %d)\n", kernel[0], kernel[1], kernel[2], sample[0], sample[1], sample[2]);
+   
+                       set_pixel(output, width, height, x, y, white);
+                       set_pixel(output, width, height, j, i, white);
+
                        matches++;
                        goto BREAK;
                     }
@@ -71,6 +81,13 @@ int main(int argc, char** argv)
             BREAK:;
         }
     }
+
+    char outname[256];
+    strcpy(outname, hashname);
+    strcat(outname, ".match.ppm");
+    //printf("%s\n", outname);
+
+    write_ppm(outname, output, width, height);
 
     printf("%s,%d\n", hashname, matches);
 
@@ -99,5 +116,14 @@ int compare(uint8_t* a, uint8_t* b, int h, int w)
         }
     }
 
+    return 1;
+}
+
+int set_pixel(uint8_t* buffer, int width, int height, int x, int y, uint8_t rgb[3])
+{
+    for (int c = 0; c < 3; c++)
+    {
+        buffer[3 * (height * y + x) + c] = rgb[c];
+    }
     return 1;
 }

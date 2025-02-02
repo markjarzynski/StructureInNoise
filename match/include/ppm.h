@@ -110,3 +110,13 @@ int read_ppm(char* filename, unsigned char* buffer, int buffer_size)
 
     return size;
 }
+
+int write_ppm(char* filename, uint8_t* buffer, int height, int width)
+{
+    FILE* f = fopen(filename, "wb");
+    fprintf(f, "P6\n%d %d\n%d\n", height, width, 255);
+    fwrite(buffer, 1, height*width*3, f);
+    fclose(f);
+
+    return 1;
+}

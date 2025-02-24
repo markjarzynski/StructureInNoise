@@ -5,6 +5,8 @@
 #include "ppm.h"
 #include "crop.h"
 
+#define CHANNELS 3
+
 int usage(char* name);
 
 int compare(uint8_t* a, uint8_t* b, int w, int h);
@@ -38,7 +40,7 @@ int main(int argc, char** argv)
     }
     */
 
-    int h = 3, w = 3;
+    int h = 5, w = 5;
 
     uint8_t kernel[h * w * 3], sample[h * w * 3];
 
@@ -48,7 +50,7 @@ int main(int argc, char** argv)
     {
         for (int x = 0; x < width - w; x++)
         {
-            int result = crop(buffer, width, height, kernel, x, y, w, h);
+            int result = crop(buffer, width, height, kernel, x, y, w, h, CHANNELS);
 
             for (int i = y; i < height - h; i++)
             {
@@ -59,7 +61,7 @@ int main(int argc, char** argv)
                         continue;
                     }
 
-                    result = crop(buffer, width, height, sample, j, i, w, h);
+                    result = crop(buffer, width, height, sample, j, i, w, h, CHANNELS);
                     result = compare(kernel, sample, w, h);
                     if (result)
                     {

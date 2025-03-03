@@ -33,3 +33,24 @@ void print_pixels(uint8_t* pixels, int width, int height, int x, int y, int w, i
         printf("\n");
     }
 }
+
+void print_uint3(uint3* pixels, int width, int height, int x, int y)
+{
+    uint3 pixel = pixels[height * y + x];
+    printf("[");
+    printf("%u,%u,%u", pixel.x, pixel.y, pixel.z);
+    printf("]");
+}
+
+void print_uint3(uint3* pixels, int width, int height, int x, int y, int w, int h)
+{
+    for (int i = 0; i < h; i++)
+    {
+        for (int j = 0; j < w; j++)
+        {
+            print_uint3(pixels, width, height, x + j, y + i);
+            printf(" ");
+        }
+        printf("\n");
+    }
+}

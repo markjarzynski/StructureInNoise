@@ -77,11 +77,11 @@ int main(int argc, char** argv)
 
                             if (result)
                             {
-                               //printf("%d, %d matches %d, %d\n", y, x, i, j);
-                               //printf("  (%d, %d, %d) == (%d, %d, %d)\n", kernel[0], kernel[1], kernel[2], sample[0], sample[1], sample[2]);
+                               printf("%d, %d matches %d, %d\n", y, x, i, j);
+                               printf("  (%d, %d, %d) == (%d, %d, %d)\n", kernel[0], kernel[1], kernel[2], sample[0], sample[1], sample[2]);
 
-                               //print_pixels(compare1, w, h, 0, 0, w, h, CHANNELS);
-                               //print_pixels(compare2, w, h, 0, 0, w, h, CHANNELS);
+                               print_pixels(compare1, w, h, 0, 0, w, h, CHANNELS);
+                               print_pixels(compare2, w, h, 0, 0, w, h, CHANNELS);
            
                                set_pixel(output, width, height, x, y, white);
                                set_pixel(output, width, height, j, i, white);

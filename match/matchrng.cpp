@@ -28,23 +28,30 @@ int main(int argc, char** argv)
         return usage(argv[0]);
 
     int height = 8, width = 8;
+    int xi = 0, yi = 0;
     int h = 3, w = 3;
 
     char* hashname = NULL;
     char* filename = NULL;
 
     int c, fflag = 0;
-    while ((c = getopt(argc, argv, "w:h:d:f:")) != -1)
+    while ((c = getopt(argc, argv, "x:y:w:h:k:f:")) != -1)
     {
         switch (c)
         {
-        case 'w':
+        case 'x': // initial x position
+            xi = atoi(optarg);
+            break;
+        case 'y': // initial y position
+            yi = atoi(optarg);
+            break;
+        case 'w': // width
             width = atoi(optarg);
             break;
-        case 'h':
+        case 'h': // height
             height = atoi(optarg);
             break;
-        case 'd':
+        case 'k': // Kernel size
             h = atoi(optarg);
             w = atoi(optarg);
             break;
@@ -88,10 +95,12 @@ int main(int argc, char** argv)
 
     int matches = 0;
 
-    for (int y = 0; y < height - h; y++)
+    for (int y = yi; y < yi + height - h; y++)
     {
-        for (int x = 0; x < width - w; x++)
+        for (int x = xi; x < xi + width - w; x++)
         {
+
+            //printf("%d, %d\n", x, y);
             if (fflag)
             {
                 crop(buffer, width, height, kernel, x, y, w, h);
@@ -105,9 +114,9 @@ int main(int argc, char** argv)
             {
                 bitshift(compare1, kernel, s, b1);
 
-                for (int i = y; i < height - h; i++)
+                for (int i = y; i < yi + height - h; i++)
                 {
-                    for (int j = x; j < width - w; j++)
+                    for (int j = x; j < xi + width - w; j++)
                     {
                         if (i == y && j == x)
                         {
@@ -157,8 +166,7 @@ int main(int argc, char** argv)
     }
 
     char outname[256];
-    strncpy(outname, hashname, 255);
-    strcat(outname, ".matchrng.ppm");
+    snprintf(outname, 255, "%s.matchrng.x%dy%d-w%dh%d-k%d.ppm", hashname, xi, yi, width, height, h);
     //printf("%s\n", outname);
 
     write_ppm(outname, output, width, height);

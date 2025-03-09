@@ -62,6 +62,8 @@ int main(int argc, char** argv)
         }
     }
 
+    //printf("x: %d, y: %d, w: %d, h: %d, k: %d\n", xi, yi, width, height, h);
+
     uint3 buffer[height * width];
 
     if (fflag)
@@ -74,6 +76,14 @@ int main(int argc, char** argv)
     else
     {
         hashname = argv[argc - 1];
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {   
+                buffer[y * width + x] = hash2rgb(hashname, xi + x, yi + y);
+            }
+        }
     }
 
     int SIZE = height * width * 3;
@@ -95,42 +105,49 @@ int main(int argc, char** argv)
 
     int matches = 0;
 
-    for (int y = yi; y < yi + height - h; y++)
+    for (int y = 0; y < height - h; y++)
     {
-        for (int x = xi; x < xi + width - w; x++)
+        for (int x = 0; x < width - w; x++)
         {
-
             //printf("%d, %d\n", x, y);
-            if (fflag)
+            //if (fflag)
             {
                 crop(buffer, width, height, kernel, x, y, w, h);
+                //print_uint3(buffer, w, h, 0, 0, w, h);
             }
+            /*
             else
             {
                 make_kernel(kernel, hashname, x, y, w, h);
             }
+            */
 
             for (int b1 = 0; b1 < BITS; b1++)
             {
                 bitshift(compare1, kernel, s, b1);
+                //print_uint3(compare1, w, h, 0, 0, w, h);
+                
 
-                for (int i = y; i < yi + height - h; i++)
+                for (int i = y; i < height - h; i++)
                 {
-                    for (int j = x; j < xi + width - w; j++)
+                    for (int j = x; j < width - w; j++)
                     {
                         if (i == y && j == x)
                         {
                             continue;
                         }
 
-                        if (fflag)
+                        //printf("%d, %d\n", i, j);
+
+                        //if (fflag)
                         {
                             crop(buffer, width, height, sample, j, i, w, h);
                         }
-                        else
+                        /*else
                         {
                             make_kernel(sample, hashname, j, i, w, h);
                         }
+                        */
 
                         for (int b2 = b1; b2 < BITS; b2++)
                         {
@@ -188,7 +205,7 @@ int compare(uint3* a, uint3* b, int h, int w)
     {
         for (int j = 0; j < w; j++)
         {
-            if (a[i * h + j] != b[i * h + j])
+            if (a[i * w + j] != b[i * w + j])
             {
                 return 0;
             }
@@ -202,7 +219,7 @@ int set_pixel(uint8_t* buffer, int width, int height, int x, int y, uint8_t rgb[
 {
     for (int c = 0; c < 3; c++)
     {
-        buffer[3 * (height * y + x) + c] = rgb[c];
+        buffer[3 * (y * width + x) + c] = rgb[c];
     }
     return 1;
 }
@@ -214,7 +231,7 @@ void make_kernel(uint3* kernel, char* hashname, int x, int y, int w, int h)
     {
         for (int j = 0; j < w; j++)
         {
-            kernel[i * h + j] = hash2rgb(hashname, x + j, y + i);
+            kernel[i * w + j] = hash2rgb(hashname, x + j, y + i);
             //printf("%d x:%d y:%d\n", i * h + j, x+j, y+i);
         }
     }

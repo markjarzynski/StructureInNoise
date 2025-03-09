@@ -31,7 +31,7 @@ int crop(uint3* pixels, int width, int height, uint3* kernel, int x, int y, int 
     {
         for (int j = 0; j < w; j++)
         {
-            kernel[i * h + j] = pixels[height * (y + i) + x + j];
+            kernel[i * w + j] = pixels[width * (y + i) + x + j];
         }
     }
 

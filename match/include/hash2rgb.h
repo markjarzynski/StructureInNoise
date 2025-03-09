@@ -145,6 +145,26 @@ uint3 hash2rgb(char* hashname, uint x, uint y)
     ELSEIF12(xxhash32)
     ELSEIF14(hybridtaus)
 
+    else if (strcmp(hashname, "white") == 0)
+    {
+        return uint3(0xffffffff, 0xffffffff, 0xffffffff);
+    }
+    else if (strcmp(hashname, "black") == 0)
+    {
+        return uint3(0, 0, 0);
+    }
+    else if (strcmp(hashname, "checkerboard") == 0)
+    {
+        if (x & 1 == 1 && y & 1 == 1 || x & 1 == 0 && y & 1 == 0)
+        {
+            return uint3(0xffffffff, 0xffffffff, 0xffffffff);
+        }
+        else
+        {
+            return uint3(0, 0, 0);
+        }
+    }
+
     else
     {
         return uint3(0,0,0);

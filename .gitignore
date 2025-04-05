@@ -1,8 +1,7 @@
 .DS_Store
-match
-bitmatch
-devrandom
-matchrng
+
+structure-in-noise
 rng2img
+
 *.ppm
 *.png

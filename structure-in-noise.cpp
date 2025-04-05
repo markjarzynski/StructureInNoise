@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <cstring>
-#include <time.h>
+#include <sys/time.h>
 
 #include "uint3.h"
 #include "random.h"
@@ -28,11 +28,13 @@ int main(int argc, char** argv)
     if (argc < 2)
         return usage(argv[0]);
 
-    int height = 8, width = 8;
+    int height = 128, width = 128;
     int xi = 0, yi = 0;
     int h = 3, w = 3;
 
-    time_t t = time(NULL);
+    struct timeval current_time;
+    gettimeofday(&current_time, NULL);
+    uint t = current_time.tv_sec * 1000000 + current_time.tv_usec;
 
     char* hashname = NULL;
     char* filename = NULL;
@@ -51,7 +53,6 @@ int main(int argc, char** argv)
         case 'r': // use random x/y positions
             xi = pcg(t);
             yi = pcg(xi);
-            printf("%u, %u, %u\n", uint(t), xi, yi);
             break;
         case 'w': // width
             width = atoi(optarg);
@@ -179,7 +180,7 @@ int main(int argc, char** argv)
     if (oflag)
     {
         char outname[256];
-        snprintf(outname, 255, "%s.matchrng.x%dy%d-w%dh%d-k%d.ppm", hashname, xi, yi, width, height, h);
+        snprintf(outname, 255, "%s.x%dy%d-w%dh%d-k%d.ppm", hashname, xi, yi, width, height, h);
         write_ppm(outname, output, width, height);
     }
 
@@ -190,7 +191,7 @@ int main(int argc, char** argv)
 
 int usage(char* name)
 {
-    printf("Usage: %s <image.ppm>\n", name);
+    printf("Usage: %s <hashname>\n", name);
     return 0;
 }
 

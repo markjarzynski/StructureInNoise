@@ -1,7 +1,0 @@
-match
-bitmatch
-devrandom
-matchrng
-rng2img
-*.ppm
-*.png

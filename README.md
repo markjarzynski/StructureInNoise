@@ -1,13 +1,6 @@
-Finding Structures in Noise
-===========================
+Structure in Noise
+==================
+
+Finding repeating patterns, artifacts and structure in PRNGs and hash functions.
 
 
-### Python & pip
-
-This project makes use of pip
-
-```
-$ python3 -m venv venv
-$ source venv/bin/activate
-$ pip install -m requirements.txt
-```

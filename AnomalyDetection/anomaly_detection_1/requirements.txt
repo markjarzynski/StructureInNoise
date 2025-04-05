@@ -1,4 +1,0 @@
-pycairo
-numpy
-iio
-scipy

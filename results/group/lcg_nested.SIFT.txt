@@ -1,8 +1,0 @@
-31 3
-28 3
-25 2
-Total matches found: 39
-Number of keypoints: 48
-Number of groups: 3
-Group sizes: 8,3,3
-SIFT Group: 8,3,3

@@ -1,7 +1,0 @@
-181 3
-178 2
-Total matches found: 184
-Number of keypoints: 191
-Number of groups: 2
-Group sizes: 3,3
-SIFT Group: 3,3

@@ -1,6 +1,0 @@
-13 2
-Total matches found: 15
-Number of keypoints: 18
-Number of groups: 1
-Group sizes: 2
-FREAK Group: 2

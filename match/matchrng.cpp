@@ -34,8 +34,8 @@ int main(int argc, char** argv)
     char* hashname = NULL;
     char* filename = NULL;
 
-    int c, fflag = 0;
-    while ((c = getopt(argc, argv, "x:y:w:h:k:f:")) != -1)
+    int c, fflag = 0, oflag = 0;
+    while ((c = getopt(argc, argv, "x:y:w:h:k:f:o")) != -1)
     {
         switch (c)
         {
@@ -58,6 +58,9 @@ int main(int argc, char** argv)
         case 'f':
             fflag = 1;
             filename = optarg;
+            break;
+        case 'o':
+            oflag = 1;
             break;
         }
     }
@@ -109,24 +112,12 @@ int main(int argc, char** argv)
     {
         for (int x = 0; x < width - w; x++)
         {
-            //printf("%d, %d\n", x, y);
-            //if (fflag)
-            {
-                crop(buffer, width, height, kernel, x, y, w, h);
-                //print_uint3(buffer, w, h, 0, 0, w, h);
-            }
-            /*
-            else
-            {
-                make_kernel(kernel, hashname, x, y, w, h);
-            }
-            */
+            crop(buffer, width, height, kernel, x, y, w, h);
 
             for (int b1 = 0; b1 < BITS; b1++)
             {
                 bitshift(compare1, kernel, s, b1);
                 //print_uint3(compare1, w, h, 0, 0, w, h);
-                
 
                 for (int i = y; i < height - h; i++)
                 {
@@ -139,15 +130,7 @@ int main(int argc, char** argv)
 
                         //printf("%d, %d\n", i, j);
 
-                        //if (fflag)
-                        {
-                            crop(buffer, width, height, sample, j, i, w, h);
-                        }
-                        /*else
-                        {
-                            make_kernel(sample, hashname, j, i, w, h);
-                        }
-                        */
+                        crop(buffer, width, height, sample, j, i, w, h);
 
                         for (int b2 = b1; b2 < BITS; b2++)
                         {
@@ -157,17 +140,20 @@ int main(int argc, char** argv)
 
                             if (result)
                             {
-                               //printf("%d, %d matches %d, %d\n", y, x, i, j);
-                               //printf("  (%d, %d, %d) == (%d, %d, %d)\n", kernel[0], kernel[1], kernel[2], sample[0], sample[1], sample[2]);
+                                //printf("%d, %d matches %d, %d\n", y, x, i, j);
+                                //printf("  (%d, %d, %d) == (%d, %d, %d)\n", kernel[0], kernel[1], kernel[2], sample[0], sample[1], sample[2]);
            
-                               //print_uint3(kernel, w, h, 0, 0, w, h);
-                               //print_uint3(sample, w, h, 0, 0, w, h);
+                                //print_uint3(kernel, w, h, 0, 0, w, h);
+                                //print_uint3(sample, w, h, 0, 0, w, h);
 
-                               set_pixel(output, width, height, x, y, white);
-                               set_pixel(output, width, height, j, i, white);
+                                if (oflag)
+                                {
+                                    set_pixel(output, width, height, x, y, white);
+                                    set_pixel(output, width, height, j, i, white);
+                                }
 
-                               matches++;
-                               goto BREAK;
+                                matches++;
+                                goto BREAK;
                             }
 
                             //int pos = 3 * (i * h + j);
@@ -182,11 +168,12 @@ int main(int argc, char** argv)
         }
     }
 
-    char outname[256];
-    snprintf(outname, 255, "%s.matchrng.x%dy%d-w%dh%d-k%d.ppm", hashname, xi, yi, width, height, h);
-    //printf("%s\n", outname);
-
-    write_ppm(outname, output, width, height);
+    if (oflag)
+    {
+        char outname[256];
+        snprintf(outname, 255, "%s.matchrng.x%dy%d-w%dh%d-k%d.ppm", hashname, xi, yi, width, height, h);
+        write_ppm(outname, output, width, height);
+    }
 
     printf("%s,%d\n", hashname, matches);
 

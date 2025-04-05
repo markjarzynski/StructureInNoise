@@ -16,13 +16,13 @@ int main(int argc, char** argv)
     if (argc < 2)
         return usage();
 
-    int fflag = 0, bflag = 0, qflag = 0;
+    int fflag = 0, bflag = 0, qflag = 0, cflag = 0;
     char* filename = NULL;
-    unsigned char buffer[SIZE2];
+    unsigned char buffer[SIZE2 * 3];
     char* hashname = NULL;
     int c;
         
-    while ((c = getopt(argc, argv, "bqf:")) != -1)
+    while ((c = getopt(argc, argv, "bqf:c")) != -1)
     {
         switch (c)
         {
@@ -35,6 +35,9 @@ int main(int argc, char** argv)
             break;
         case 'q':
             qflag = 1;
+            break;
+        case 'c':
+            cflag = 1;
             break;
         }
     }
@@ -60,11 +63,20 @@ int main(int argc, char** argv)
         {
             if (fflag)
             {
-                char c = buffer[j * SIZE + i];
+                if (cflag)
+                {
+                    (*pixel)[0] = buffer[3 * (j * SIZE + i) + 0];
+                    (*pixel)[1] = buffer[3 * (j * SIZE + i) + 1];
+                    (*pixel)[2] = buffer[3 * (j * SIZE + i) + 2];
+                }
+                else 
+                {
+                    char c = buffer[j * SIZE + i];
 
-                (*pixel)[0] = c;
-                (*pixel)[1] = c;
-                (*pixel)[2] = c;
+                    (*pixel)[0] = c;
+                    (*pixel)[1] = c;
+                    (*pixel)[2] = c;
+                }
             }
             else if (bflag)
             {

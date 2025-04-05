@@ -40,6 +40,27 @@ uint3 hash2rgb(char* hashname, uint x, uint y)
         return uint3(h, h, h);              \
     }
 
+#define ELSEIF12_(HASH,NAME)                \
+    else if (strcmp(hashname, #NAME) == 0)  \
+    {                                       \
+        uint h = HASH(uint2(x,y));          \
+        return uint3(h, h, h);              \
+    }
+
+#define ELSEIF13_(HASH,NAME)                \
+    else if (strcmp(hashname, #NAME) == 0)  \
+    {                                       \
+        uint h = HASH(uint3(x, y, 0u));     \
+        return uint3(h, h, h);              \
+    }
+
+#define ELSEIF14_(HASH,NAME)                \
+    else if (strcmp(hashname, #NAME) == 0)  \
+    {                                       \
+        uint h = HASH(uint4(x, y, 0u, 0u)); \
+        return uint3(h, h, h);              \
+    }
+
 #define ELSEIF22(HASH)                      \
     else if (strcmp(hashname, #HASH) == 0)  \
     {                                       \
@@ -103,20 +124,42 @@ uint3 hash2rgb(char* hashname, uint x, uint y)
         return uint3(h.x, h.y, h.z);        \
     }
 
+#define ELSEIF12f(HASH)                     \
+    else if (strcmp(hashname, #HASH) == 0)  \
+    {                                       \
+        float h = HASH(float2(x,y));        \
+        uint u = h * float(0xffffffffu);    \
+        return uint3(u, u, u);              \
+    }
 
-    ELSEIF12(city)
+    ELSEIF11(bbs)
+    ELSEIF12_(city, city_2)
+    ELSEIF13_(city, city_3)
+    ELSEIF14_(city, city_4)
     ELSEIF11(esgtsa)
+    ELSEIF12f(fast)
+    ELSEIF12f(ign)
     ELSEIF11(iqint1)
     ELSEIF33(iqint2)
     ELSEIF12(iqint3)
     ELSEIF12(jkiss32)
     ELSEIF11(lcg)
+    ELSEIF42(md5_2)
+    ELSEIF43(md5_3)
     ELSEIF44(md5)
-    ELSEIF12(murmur3)
+    ELSEIF12_(murmur3, murmur3_2)
+    ELSEIF13_(murmur3, murmur3_3)
+    ELSEIF14_(murmur3, murmur3_4)
+    ELSEIF11(pcg)
+    ELSEIF22(pcg2d)
     ELSEIF33(pcg3d)
+    ELSEIF33(pcg3d16)
     ELSEIF44(pcg4d)
+    ELSEIF12f(pseudo)
     ELSEIF11(ranlim32)
-    ELSEIF12(superfast)
+    ELSEIF12_(superfast, superfast_2)
+    ELSEIF13_(superfast, superfast_3)
+    ELSEIF14_(superfast, superfast_4)
     
     else if (strcmp(hashname, "tea2") == 0)
     {
@@ -138,11 +181,14 @@ uint3 hash2rgb(char* hashname, uint x, uint y)
         uint2 h = tea(5, uint2(x,y));
         return uint3(h.x, h.y, 0u);
     }
-
+    
+    ELSEIF12f(trig)
     ELSEIF11(wang)
     ELSEIF44(xorshift128)
     ELSEIF11(xorshift32)
-    ELSEIF12(xxhash32)
+    ELSEIF12_(xxhash32, xxhash32_2)
+    ELSEIF13_(xxhash32, xxhash32_3)
+    ELSEIF14_(xxhash32, xxhash32_4)
     ELSEIF14(hybridtaus)
 
     else if (strcmp(hashname, "white") == 0)

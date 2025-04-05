@@ -19,12 +19,15 @@ all: build
 		./rng2img $$i ; \
 	done
 
-.PHONY: convert clean clobber
+.PHONY: convert devrandom clean clobber 
 convert:
 	for i in *.ppm ; \
 	do \
 		convert $$i $$(basename -s .ppm $$i).png ; \
 	done
+
+devrandom:
+	head -c 196608 /dev/random > devrandom
 
 clean:
 	rm -f rng2img *.ppm

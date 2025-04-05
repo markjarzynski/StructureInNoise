@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <cstring>
+#include <time.h>
 
 #include "uint3.h"
 #include "random.h"
@@ -31,11 +32,13 @@ int main(int argc, char** argv)
     int xi = 0, yi = 0;
     int h = 3, w = 3;
 
+    time_t t = time(NULL);
+
     char* hashname = NULL;
     char* filename = NULL;
 
     int c, fflag = 0, oflag = 0;
-    while ((c = getopt(argc, argv, "x:y:w:h:k:f:o")) != -1)
+    while ((c = getopt(argc, argv, "x:y:rw:h:k:f:o")) != -1)
     {
         switch (c)
         {
@@ -44,6 +47,11 @@ int main(int argc, char** argv)
             break;
         case 'y': // initial y position
             yi = atoi(optarg);
+            break;
+        case 'r': // use random x/y positions
+            xi = pcg(t);
+            yi = pcg(xi);
+            printf("%u, %u, %u\n", uint(t), xi, yi);
             break;
         case 'w': // width
             width = atoi(optarg);

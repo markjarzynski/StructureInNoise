@@ -17,13 +17,14 @@ int main(int argc, char** argv)
     if (argc < 2)
         return usage();
 
-    int fflag = 0, bflag = 0, qflag = 0, cflag = 0;
+    int fflag = 0, bflag = 0, qflag = 0, cflag = 0, oflag = 0;
     int width = 256, height = 256;
     char* filename = NULL;
+    char* outfilename = NULL;
     char* hashname = NULL;
-    int c;
         
-    while ((c = getopt(argc, argv, "bqf:cw:h:")) != -1)
+    int c;
+    while ((c = getopt(argc, argv, "bqf:cw:h:o:")) != -1)
     {
         switch (c)
         {
@@ -46,15 +47,19 @@ int main(int argc, char** argv)
         case 'h':
             height = atoi(optarg);
             break;
+        case 'o':
+            oflag = 1;
+            outfilename = optarg;
+            break;
         }
     }
     
-    uint8_t buffer[width * height * 3];
+    uint32_t buffer[width * height * 3];
 
     if (fflag)
     {
         FILE* f = fopen(filename, "rb");
-        fread(buffer, sizeof(buffer), 1, f);
+        size_t result = fread(buffer, sizeof(buffer), 1, f);
         hashname = filename;
         fclose(f);
     }
@@ -63,6 +68,16 @@ int main(int argc, char** argv)
         hashname = argv[argc - 1];
     }
 
+    char outname[256];
+    if (oflag)
+    {
+        strncpy(outname, outfilename, 250);
+    }
+    else
+    {
+        strncpy(outname, hashname, 250);
+        strncat(outname, ".ppm", 254);
+    }
 
     uint8_t (*pixels)[3] = new uint8_t[width*height][3];
     uint8_t (*pixel)[3] = pixels;
@@ -72,7 +87,22 @@ int main(int argc, char** argv)
         {
             if (fflag)
             {
-                if (cflag)
+                if (bflag)
+                {
+                    uint x = uint(8.f * (float(i) / float(width)));
+                    uint y = uint(4.f * (float(j) / float(height)));
+                    uint bit = x + 8u * y;
+
+                    uint3 v;
+                    v.x = buffer[3 * (j * width + i) + 0];
+                    v.y = buffer[3 * (j * width + i) + 1];
+                    v.z = buffer[3 * (j * width + i) + 2];
+
+                    (*pixel)[0] = uint8_t(((v.x >> bit) & 1u) * 255u);
+                    (*pixel)[1] = uint8_t(((v.y >> bit) & 1u) * 255u);
+                    (*pixel)[2] = uint8_t(((v.z >> bit) & 1u) * 255u);
+                }
+                else if (cflag)
                 {
                     (*pixel)[0] = buffer[3 * (j * width + i) + 0];
                     (*pixel)[1] = buffer[3 * (j * width + i) + 1];
@@ -80,12 +110,13 @@ int main(int argc, char** argv)
                 }
                 else 
                 {
-                    char c = buffer[j * width + i];
+                    uint8_t c = buffer[j * width + i];
 
                     (*pixel)[0] = c;
                     (*pixel)[1] = c;
                     (*pixel)[2] = c;
                 }
+
             }
             else if (bflag)
             {
@@ -140,10 +171,6 @@ int main(int argc, char** argv)
             pixel++;
         }
     }
-
-    char outname[255];
-    strncpy(outname, hashname, 250);
-    strncat(outname, ".ppm", 254);
 
     FILE* f = fopen(outname, "wb");
     fprintf(f, "P6\n%d %d\n%d\n", width, height, 255);

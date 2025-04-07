@@ -8,7 +8,7 @@ k=4
 
 for hash in ${hashes[@]} ;
 do
-    ./matchrng -x $1 -y $2 -w $width -h $height -k $k $hash
+    ./structure-in-noise -x $1 -y $2 -w $width -h $height -k $k $hash
 done
 
-./matchrng -x $1 -y $2 -w $width -h $height -k $k -f /dev/random
+./structure-in-noise -x $1 -y $2 -w $width -h $height -k $k -f /dev/random

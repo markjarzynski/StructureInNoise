@@ -7,6 +7,7 @@
 #include "random.h"
 #include "hash2rgb.h"
 #include "bitshift.h"
+#include "popcnt.h"
 
 #include "ppm.h"
 #include "crop.h"
@@ -17,7 +18,7 @@
 
 int usage(char* name);
 
-int compare(uint32_t* a, uint32_t* b, int w, int h);
+uint32_t compare(uint32_t* a, uint32_t* b, int w, int h);
  
 int set_pixel(uint8_t* buffer, int width, int height, int x, int y, uint8_t rgb[3]);
 
@@ -111,7 +112,7 @@ int main(int argc, char** argv)
 
     int s = h * w;
 
-    uint32_t kernel[s], sample[s], compare1[s], compare2[s];
+    uint32_t neighborhood1[s], neighborhood2[s];
 
     int matches = 0;
 
@@ -119,11 +120,11 @@ int main(int argc, char** argv)
     {
         for (int x = 0; x < width - w; x++)
         {
-            crop(buffer, width, height, kernel, x, y, w, h);
+            crop(buffer, width, height, neighborhood1, x, y, w, h);
 
-            for (int b1 = 0; b1 < BITS; b1++)
+            //for (int b1 = 0; b1 < BITS; b1++)
             {
-                bitshift(compare1, kernel, s, b1);
+                //bitshift(compare1, kernel, s, b1);
                 //print_uint3(compare1, w, h, 0, 0, w, h);
 
                 for (int j = 0; j < height - h; j++)
@@ -132,19 +133,22 @@ int main(int argc, char** argv)
                     {
                         //printf("%d, %d\n", i, j);
 
-                        crop(buffer, width, height, sample, i, j, w, h);
+                        crop(buffer, width, height, neighborhood2, i, j, w, h);
 
-                        for (int b2 = 0; b2 < BITS; b2++)
+                        //for (int b2 = 0; b2 < BITS; b2++)
                         {
-                            if ((i == x) && (j == y) && (b1 == b2))
+                            if ((i == x) && (j == y))// && (b1 == b2))
                             {
                                 continue;
                             }
 
-                            bitshift(compare2, sample, s, b2);
+                            //bitshift(compare2, sample, s, b2);
 
-                            int result = compare(compare1, compare2, w, h);
+                            uint32_t result = compare(neighborhood1, neighborhood2, w, h);
 
+                            matches += result;
+
+                            /*
                             if (result)
                             {
                                 //printf("%d, %d matches %d, %d\n", y, x, i, j);
@@ -161,6 +165,7 @@ int main(int argc, char** argv)
 
                                 matches++;
                             }
+                            */
 
                             //int pos = 3 * (i * h + j);
                             //printf("%d, %d, %d\n", kernel[pos], kernel[pos + 1], kernel[pos + 2]);
@@ -190,20 +195,19 @@ int usage(char* name)
     return 0;
 }
 
-int compare(uint32_t* a, uint32_t* b, int h, int w)
+uint32_t compare(uint32_t* a, uint32_t* b, int w, int h)
 {
-    for (int i = 0; i < h; i++)
+    uint32_t result = 0xFFFFFFFFu;
+
+    for (int j = 0; j < h; j++)
     {
-        for (int j = 0; j < w; j++)
+        for (int i = 0; i < w; i++)
         {
-            if (a[i * w + j] != b[i * w + j])
-            {
-                return 0;
-            }
+            result &= ~(a[j * w + i] ^ b[j * w + i]);
         }
     }
 
-    return 1;
+    return popcnt(result);
 }
 
 int set_pixel(uint8_t* buffer, int width, int height, int x, int y, uint8_t rgb[3])

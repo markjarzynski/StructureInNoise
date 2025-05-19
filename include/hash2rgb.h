@@ -201,7 +201,7 @@ uint32_t hash2rgb(char* hashname, uint x, uint y)
     }
     else if (strcmp(hashname, "checkerboard") == 0)
     {
-        if (x & 1 == 1 && y & 1 == 1 || x & 1 == 0 && y & 1 == 0)
+        if ((x & 1) == 1 && (y & 1) == 1 || (x & 1) == 0 && (y & 1) == 0)
         {
             return 0xffffffff;
         }

@@ -25,7 +25,7 @@ int crop(uint8_t* pixels, int width, int height, uint8_t* kernel, int x, int y, 
     return 1;
 }
 
-int crop(uint3* pixels, int width, int height, uint3* kernel, int x, int y, int w, int h)
+int crop(uint32_t* pixels, int width, int height, uint32_t* kernel, int x, int y, int w, int h)
 {
     for (int i = 0; i < h; i++)
     {

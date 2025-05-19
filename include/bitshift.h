@@ -12,7 +12,7 @@ void bitshift(uint8_t* out, uint8_t* in, int size, int shift)
     }
 }
 
-void bitshift(uint3* out, uint3* in, int size, int shift)
+void bitshift(uint32_t* out, uint32_t* in, int size, int shift)
 {
     for (int i = 0; i < size; i++)
     {

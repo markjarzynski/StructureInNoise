@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <sys/time.h>
+#include <inttypes.h>
 
 #if defined(USE_MPI)
 #include <mpi.h>
@@ -162,7 +163,7 @@ int main(int argc, char** argv)
 
     if (world_rank == 0)
     {
-        printf("%s,%lu\n", hashname, matches);
+        printf("%s,%" PRIu64 "\n", hashname, matches);
     }
 
 #if defined(USE_MPI)

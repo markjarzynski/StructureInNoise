@@ -3,6 +3,10 @@
 #include <string.h>
 #include <sys/time.h>
 
+#if defined(USE_MPI)
+#include <mpi.h>
+#endif
+
 #include "uint3.h"
 #include "random.h"
 #include "hash2rgb.h"
@@ -97,9 +101,21 @@ int main(int argc, char** argv)
 
     uint32_t neighborhood1[s], neighborhood2[s];
 
+    int world_size = 1, world_rank = 0;
+
+#if defined(USE_MPI)
+    MPI_Init(NULL, NULL);
+
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+#endif
+
     uint64_t matches = 0;
 
-    for (int y = 0; y < height - h + 1; y++)
+    int start = world_rank * (height - h + 1) / world_size;
+    int end = (world_rank + 1) * (height - h + 1) / world_size;
+
+    for (int y = start; y < end; y++)
     {
         for (int x = 0; x < width - w + 1; x++)
         {
@@ -126,7 +142,32 @@ int main(int argc, char** argv)
         }
     }
 
-    printf("%s,%llu\n", hashname, matches);
+#if defined(USE_MPI)
+    uint64_t* world_matches = NULL;
+    if (world_rank == 0)
+    {
+        world_matches = (uint64_t*)malloc(sizeof(uint64_t) * world_size);
+    }
+
+    MPI_Gather(&matches, 1, MPI_UINT64_T, world_matches, 1, MPI_UINT64_T, 0, MPI_COMM_WORLD);
+
+    if (world_rank == 0)
+    {
+        for (int i = 1; i < world_size; i++)
+        {
+            matches += world_matches[i];
+        }
+    }
+#endif
+
+    if (world_rank == 0)
+    {
+        printf("%s,%lu\n", hashname, matches);
+    }
+
+#if defined(USE_MPI)
+    MPI_Finalize();
+#endif
 
     return 0;
 }

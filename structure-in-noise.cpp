@@ -132,6 +132,7 @@ int main(int argc, char** argv)
                     {
                         if ((i == x) && (j == y) && (b == 0))
                         {
+                            rotr(neighborhood2, s, 1);
                             continue; // same index and same bit
                         }
     

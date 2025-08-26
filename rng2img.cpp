@@ -9,8 +9,6 @@
 
 int usage();
 
-uint3 hash2rgb(char* hashname, uint x, uint y);
-
 int main(int argc, char** argv)
 {
 
@@ -124,15 +122,15 @@ int main(int argc, char** argv)
                 uint y = uint(4.f * (float(j) / float(height)));
                 uint bit = x + 8u * y;
 
-                uint3 v = hash2rgb(hashname, i, j);
+                uint32_t v = hash2rgb(hashname, i, j);
 
-                (*pixel)[0] = uint8_t(((v.x >> bit) & 1u) * 255u);
-                (*pixel)[1] = uint8_t(((v.y >> bit) & 1u) * 255u);
-                (*pixel)[2] = uint8_t(((v.z >> bit) & 1u) * 255u);
+                (*pixel)[0] = uint8_t(((v >> bit) & 1u) * 255u);
+                (*pixel)[1] = uint8_t(((v >> bit) & 1u) * 255u);
+                (*pixel)[2] = uint8_t(((v >> bit) & 1u) * 255u);
             }
             else if (qflag)
             {
-                uint3 v = hash2rgb(hashname, i, j);
+                uint32_t v = hash2rgb(hashname, i, j);
                 uint b = 0;
 
                 if (i >= (width / 2))
@@ -152,20 +150,20 @@ int main(int argc, char** argv)
                     b = 2;
                 }
                         
-                (*pixel)[0] = uint8_t((v.x >> (b * 8u)) & 0xff);
-                (*pixel)[1] = uint8_t((v.y >> (b * 8u)) & 0xff);
-                (*pixel)[2] = uint8_t((v.z >> (b * 8u)) & 0xff);
+                (*pixel)[0] = uint8_t((v >> (b * 8u)) & 0xff);
+                (*pixel)[1] = uint8_t((v >> (b * 8u)) & 0xff);
+                (*pixel)[2] = uint8_t((v >> (b * 8u)) & 0xff);
             }
             else
             {
-                uint3 v = hash2rgb(hashname, i, j);
+                uint32_t v = hash2rgb(hashname, i, j);
 
                 float scale = 1.f / (float)0xffffffffu;
-                float3 f = v * float3(scale);
+                float f = v * scale;
 
-                (*pixel)[0] = uint8_t(f.x * 255u);
-                (*pixel)[1] = uint8_t(f.y * 255u);
-                (*pixel)[2] = uint8_t(f.z * 255u);
+                (*pixel)[0] = uint8_t(f * 255u);
+                (*pixel)[1] = uint8_t(f * 255u);
+                (*pixel)[2] = uint8_t(f * 255u);
             };
 
             pixel++;

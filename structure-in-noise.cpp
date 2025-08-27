@@ -112,6 +112,7 @@ int main(int argc, char** argv)
 #endif
 
     uint64_t matches = 0;
+    uint64_t bitplane_matches[BITS] = { 0 };
 
     int start = world_rank * (height - h + 1) / world_size;
     int end = (world_rank + 1) * (height - h + 1) / world_size;
@@ -135,8 +136,17 @@ int main(int argc, char** argv)
                             rotr(neighborhood2, s, 1);
                             continue; // same index and same bit
                         }
-    
-                        matches += compare(neighborhood1, neighborhood2, w, h, 0);
+                        uint32_t comp = compare(neighborhood1, neighborhood2, w, h, 0); 
+                        matches += popcnt(comp);
+                        
+                        if (b == 0)
+                        {
+                            for (int a = 0; a < BITS; a++)
+                            {
+                                bitplane_matches[a] += (comp >> a) & 1;
+                            }
+                        }
+        
                         rotr(neighborhood2, s, 1);
                     }
                 }
@@ -146,25 +156,40 @@ int main(int argc, char** argv)
 
 #if defined(USE_MPI)
     uint64_t* world_matches = NULL;
+    uint64_t* world_bitplane_matches = NULL;
     if (world_rank == 0)
     {
         world_matches = (uint64_t*)malloc(sizeof(uint64_t) * world_size);
+        world_bitplane_matches = (uint64_t*)malloc(sizeof(uint64_t) * world_size * BITS);
     }
 
     MPI_Gather(&matches, 1, MPI_UINT64_T, world_matches, 1, MPI_UINT64_T, 0, MPI_COMM_WORLD);
+    MPI_Gather(bitplane_matches, BITS, MPI_UINT64_T, world_bitplane_matches, BITS, MPI_UINT64_T, 0, MPI_COMM_WORLD);
 
     if (world_rank == 0)
     {
         for (int i = 1; i < world_size; i++)
         {
             matches += world_matches[i];
+            for (int b = 0; b < BITS; b++)
+            {
+                bitplane_matches[b] += world_bitplane_matches[i * BITS + b];
+            }
         }
     }
 #endif
 
     if (world_rank == 0)
     {
-        printf("%s,%" PRIu64 "\n", hashname, matches);
+        printf("%s", hashname);
+
+        for (int b = 0; b < BITS; b++)
+        {
+            printf(",%" PRIu64, bitplane_matches[b]);
+        }
+        printf(",%" PRIu64, matches);
+
+        printf("\n");
     }
 
 #if defined(USE_MPI)
@@ -192,5 +217,5 @@ uint32_t compare(uint32_t* a, uint32_t* b, int w, int h, int shift)
         }
     }
 
-    return popcnt(result);
+    return result;
 }

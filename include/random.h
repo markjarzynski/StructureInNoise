@@ -573,7 +573,7 @@ uint3 pcg3d16(uint3 v)
     v.y += v.z*v.x;
     v.z += v.x*v.y;
 
-    //v = v >> 16u;
+    v = v >> 16u;
 
     return v;
 }

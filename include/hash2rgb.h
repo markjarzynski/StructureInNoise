@@ -191,6 +191,18 @@ uint32_t hash2rgb(char* hashname, uint x, uint y)
     ELSEIF14_(xxhash32, xxhash32_4)
     ELSEIF14(hybridtaus)
 
+    ELSEIF14(xoshiro128plusplus)
+    ELSEIF14(xoshiro128starstar)
+    ELSEIF11(lowbias32)
+    ELSEIF11(pxq)
+    ELSEIF11(newintegerhash)
+    ELSEIF11(prospector_best)
+    ELSEIF12(one_at_a_time_2)
+    ELSEIF13(one_at_a_time_3)
+    ELSEIF14(one_at_a_time_4)
+    ELSEIF33(lookup3)
+    ELSEIF12(pixar_randfloat)
+
     else if (strcmp(hashname, "white") == 0)
     {
         return 0xffffffff;

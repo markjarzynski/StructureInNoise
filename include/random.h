@@ -1112,3 +1112,218 @@ uint3 test(uint3 v) {
 
     return uint3(p.x, p.y, p.z);
 }
+
+
+
+// New hash functions
+
+// https://prng.di.unimi.it/
+uint xoshiro128plusplus(uint4 s)
+{
+	uint t = s.y << 9;
+
+	s.z ^= s.x;
+	s.w ^= s.y;
+	s.y ^= s.z;
+	s.x ^= s.w;
+
+	s.z ^= t;
+
+	s.w = rotl(s.w, 11u);
+
+	return rotl(s.x + s.w, 7u) + s.x;
+}
+
+// https://prng.di.unimi.it/
+uint xoshiro128starstar(uint4 s)
+{
+	uint t = s.y << 9;
+
+	s.z ^= s.x;
+	s.w ^= s.y;
+	s.y ^= s.z;
+	s.x ^= s.w;
+
+	s.z ^= t;
+    
+	s.w = rotl(s.w, 11u);
+        
+   	return rotl(s.y * 5u, 7u) * 9u;
+}
+
+
+// https://nullprogram.com/blog/2018/07/31/
+uint lowbias32(uint x)
+{
+    x ^= x >> 16;
+    x *= 0x7feb352dU;
+    x ^= x >> 15;
+    x *= 0x846ca68bU;
+    x ^= x >> 16;
+    return x;
+}
+
+
+// https://github.com/skeeto/hash-prospector/issues/23#issuecomment-1401616701
+uint pxq(uint v)
+{
+    uint state = (v | 1u) ^ (v * v);
+    uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+    return (word >> 22u) ^ word;
+}
+
+
+// https://github.com/skeeto/hash-prospector/issues/23#issuecomment-1407393298
+// https://www.shadertoy.com/view/dllSW7
+uint newintegerhash(uint x)
+{
+    x ^= x >> 15;
+    x ^= (x * x) | 1u;
+    x ^= x >> 17;
+    x *= 0x9E3779B9u;
+    x ^= x >> 13;
+    return x;
+}
+
+
+// https://github.com/skeeto/hash-prospector/issues/19#issuecomment-1120105785
+uint prospector_best(uint x)
+{
+    x = (x ^ (x >> 16)) * 0x21f0aaadU;
+    x = (x ^ (x >> 15)) * 0x735a2d97U;
+    return x ^ (x >> 15);
+}
+
+
+// https://www.burtleburtle.net/bob/hash/doobs.html
+uint one_at_a_time_1(uint key)
+{
+    uint hash = key;
+    hash += (hash << 10);
+    hash ^= (hash >> 6);
+        
+    hash += (hash << 3);
+    hash ^= (hash >> 11);
+    hash += (hash << 15);
+    return hash;
+}
+
+uint one_at_a_time_2(uint2 key)
+{
+    uint hash = 0u;
+    /*    
+    for (int i = 0; i < 2; ++i)
+    {
+        hash += key[i];
+        hash += (hash << 10);
+        hash ^= (hash >> 6);
+    }
+    */
+
+    hash += key.x;
+    hash += (hash << 10);
+    hash ^= (hash >> 6);
+
+    hash += key.y;
+    hash += (hash << 10);
+    hash ^= (hash >> 6);
+
+    hash += (hash << 3);
+    hash ^= (hash >> 11);
+    hash += (hash << 15);
+    return hash;
+}
+
+uint one_at_a_time_3(uint3 key)
+{
+    uint hash = 0u;
+   
+    /* 
+    for (int i = 0; i < 3; ++i)
+    {
+        hash += key[i];
+        hash += (hash << 10);
+        hash ^= (hash >> 6);
+    }
+    */
+    hash += key.x;
+    hash += (hash << 10);
+    hash ^= (hash >> 6);
+
+    hash += key.y;
+    hash += (hash << 10);
+    hash ^= (hash >> 6);
+
+    hash += key.z;
+    hash += (hash << 10);
+    hash ^= (hash >> 6);
+
+    hash += (hash << 3);
+    hash ^= (hash >> 11);
+    hash += (hash << 15);
+    return hash;
+}
+
+uint one_at_a_time_4(uint4 key)
+{
+    uint hash = 0u;
+    
+    /*
+    for (int i = 0; i < 4; ++i)
+    {
+        hash += key[i];
+        hash += (hash << 10);
+        hash ^= (hash >> 6);
+    }
+    */
+    hash += key.x;
+    hash += (hash << 10);
+    hash ^= (hash >> 6);
+
+    hash += key.y;
+    hash += (hash << 10);
+    hash ^= (hash >> 6);
+
+    hash += key.z;
+    hash += (hash << 10);
+    hash ^= (hash >> 6);
+
+    hash += key.w;
+    hash += (hash << 10);
+    hash ^= (hash >> 6);
+
+    hash += (hash << 3);
+    hash ^= (hash >> 11);
+    hash += (hash << 15);
+    return hash;
+}
+
+// mix(a,b,c) from https://www.burtleburtle.net/bob/c/lookup3.c
+uint3 lookup3(uint3 v)
+{
+    v.x -= v.z;  v.x ^= rotl(v.z, 4u);  v.z += v.y;
+    v.y -= v.x;  v.y ^= rotl(v.x, 6u);  v.x += v.z;
+    v.z -= v.y;  v.z ^= rotl(v.y, 8u);  v.y += v.x;
+    v.x -= v.z;  v.x ^= rotl(v.z,16u);  v.z += v.y;
+    v.y -= v.x;  v.y ^= rotl(v.x,19u);  v.x += v.z;
+    v.z -= v.y;  v.z ^= rotl(v.y, 4u);  v.y += v.x;
+    return v;
+}
+
+
+// https://graphics.pixar.com/library/MultiJitteredSampling/paper.pdf
+//float pixar_randfloat(uint2 v)
+uint pixar_randfloat(uint2 v)
+{
+    v.y *= 0xa399d265u; // 0x711ad6a5u
+
+    v.x ^= v.y;
+    v.x ^= v.x >> 17u;
+    v.x ^= v.x >> 10u; v.x *= 0xb36534e5u;
+    v.x ^= v.x >> 12u;
+    v.x ^= v.x >> 21u; v.x *= 0x93fc4795u;
+    v.x ^= 0xdf6e307fu;
+    v.x ^= v.x >> 17; v.x *= 1u | v.y >> 18u;
+    //return float(v.x) * (1.0f / 4294967808.f);
+    return v.x;
+}

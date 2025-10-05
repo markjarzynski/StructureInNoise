@@ -65,7 +65,17 @@ uint32_t hash2rgb(char* hashname, uint x, uint y)
     else if (strcmp(hashname, #HASH) == 0)  \
     {                                       \
         uint2 h = HASH(uint2(x, y));        \
-        return h.x;         \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".x") == 0)  \
+    {                                       \
+        uint2 h = HASH(uint2(x, y));        \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".y") == 0)  \
+    {                                       \
+        uint2 h = HASH(uint2(x, y));        \
+        return h.y;                         \
     }
 
 #define ELSEIF23(HASH)                      \
@@ -73,10 +83,30 @@ uint32_t hash2rgb(char* hashname, uint x, uint y)
     {                                       \
         uint2 h = HASH(uint3(x, y, 0u));    \
         return h.x;         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".x") == 0)  \
+    {                                       \
+        uint2 h = HASH(uint3(x, y, 0u));    \
+        return h.x;         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".y") == 0)  \
+    {                                       \
+        uint2 h = HASH(uint3(x, y, 0u));    \
+        return h.y;         \
     }
 
 #define ELSEIF24(HASH)                      \
     else if (strcmp(hashname, #HASH) == 0)  \
+    {                                       \
+        uint2 h = HASH(uint4(x, y, 0u, 0u));\
+        return h.x;          \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".x") == 0)  \
+    {                                       \
+        uint2 h = HASH(uint4(x, y, 0u, 0u));\
+        return h.x;          \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".y") == 0)  \
     {                                       \
         uint2 h = HASH(uint4(x, y, 0u, 0u));\
         return h.x;          \
@@ -86,7 +116,22 @@ uint32_t hash2rgb(char* hashname, uint x, uint y)
     else if (strcmp(hashname, #HASH) == 0)  \
     {                                       \
         uint3 h = HASH(uint2(x, y));        \
-        return h;                           \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".x") == 0)  \
+    {                                       \
+        uint3 h = HASH(uint2(x, y));        \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".y") == 0)  \
+    {                                       \
+        uint3 h = HASH(uint2(x, y));        \
+        return h.y;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".z") == 0)  \
+    {                                       \
+        uint3 h = HASH(uint2(x, y));        \
+        return h.z;                         \
     }
 
 #define ELSEIF33(HASH)                      \
@@ -94,34 +139,124 @@ uint32_t hash2rgb(char* hashname, uint x, uint y)
     {                                       \
         uint3 h = HASH(uint3(x, y, 0u));    \
         return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".x") == 0) \
+    {                                       \
+        uint3 h = HASH(uint3(x, y, 0u));    \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".y") == 0) \
+    {                                       \
+        uint3 h = HASH(uint3(x, y, 0u));    \
+        return h.y;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".z") == 0) \
+    {                                       \
+        uint3 h = HASH(uint3(x, y, 0u));    \
+        return h.z;                         \
     }
 
 #define ELSEIF34(HASH)                      \
     else if (strcmp(hashname, #HASH) == 0)  \
     {                                       \
         uint3 h = HASH(uint4(x, y, 0u, 0u));\
-        return h.x;        \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".x") == 0) \
+    {                                       \
+        uint3 h = HASH(uint4(x, y, 0u, 0u));\
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".y") == 0) \
+    {                                       \
+        uint3 h = HASH(uint4(x, y, 0u, 0u));\
+        return h.y;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".z") == 0) \
+    {                                       \
+        uint3 h = HASH(uint4(x, y, 0u, 0u));\
+        return h.z;                         \
     }
 
 #define ELSEIF42(HASH)                      \
     else if (strcmp(hashname, #HASH) == 0)  \
     {                                       \
         uint4 h = HASH(uint2(x, y));        \
-        return h.x;        \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".x") == 0) \
+    {                                       \
+        uint4 h = HASH(uint2(x, y));        \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".y") == 0) \
+    {                                       \
+        uint4 h = HASH(uint2(x, y));        \
+        return h.y;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".z") == 0) \
+    {                                       \
+        uint4 h = HASH(uint2(x, y));        \
+        return h.z;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".w") == 0) \
+    {                                       \
+        uint4 h = HASH(uint2(x, y));        \
+        return h.w;                         \
     }
 
 #define ELSEIF43(HASH)                      \
     else if (strcmp(hashname, #HASH) == 0)  \
     {                                       \
         uint4 h = HASH(uint3(x, y, 0u));    \
-        return h.x;        \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".x") == 0) \
+    {                                       \
+        uint4 h = HASH(uint3(x, y, 0u));    \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".y") == 0) \
+    {                                       \
+        uint4 h = HASH(uint3(x, y, 0u));    \
+        return h.y;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".z") == 0) \
+    {                                       \
+        uint4 h = HASH(uint3(x, y, 0u));    \
+        return h.z;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".w") == 0) \
+    {                                       \
+        uint4 h = HASH(uint3(x, y, 0u));    \
+        return h.w;                         \
     }
 
 #define ELSEIF44(HASH)                      \
     else if (strcmp(hashname, #HASH) == 0)  \
     {                                       \
         uint4 h = HASH(uint4(x, y, 0u, 0u));\
-        return h.x;        \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".x") == 0) \
+    {                                       \
+        uint4 h = HASH(uint4(x, y, 0u, 0u));\
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".y") == 0) \
+    {                                       \
+        uint4 h = HASH(uint4(x, y, 0u, 0u));\
+        return h.y;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".z") == 0) \
+    {                                       \
+        uint4 h = HASH(uint4(x, y, 0u, 0u)); \
+        return h.z;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".w") == 0) \
+    {                                       \
+        uint4 h = HASH(uint4(x, y, 0u, 0u));\
+        return h.w;                         \
     }
 
 #define ELSEIF12f(HASH)                     \

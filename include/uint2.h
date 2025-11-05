@@ -29,6 +29,15 @@ public:
 
     ~uint2(){}
 
+    uint2 operator&(uint s)
+    {
+        return uint2(x & s, y & s);
+    }
+
+    uint2 operator&(const uint2& b)
+    {
+        return uint2(x & b.x, y & b.y);
+    }
 };
 
 // vector addition

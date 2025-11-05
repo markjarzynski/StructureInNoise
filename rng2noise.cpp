@@ -16,15 +16,17 @@ int main(int argc, char** argv)
     if (argc < 2)
         return usage();
 
-    int fflag = 0, oflag = 0, sflag = 0;
+    int fflag = 0, oflag = 0, sflag = 0, aflag = 0, bflag = 0;
     int width = 256, height = 256;
     char* filename = NULL;
     char* outfilename = NULL;
     char* hashname = NULL;
     float s = 16.f;
+
+    uint a = 13, b = 19; 
         
     int c;
-    while ((c = getopt(argc, argv, "bqf:cw:h:o:s:")) != -1)
+    while ((c = getopt(argc, argv, "f:w:h:o:s:a:b:")) != -1)
     {
         switch (c)
         {
@@ -45,6 +47,14 @@ int main(int argc, char** argv)
         case 's':
             sflag = 1;
             s = atof(optarg);
+            break;
+        case 'a':
+            aflag = 1;
+            a = atoi(optarg);
+            break;
+        case 'b':
+            bflag = 1;
+            b = atoi(optarg);
             break;
         }
     }
@@ -92,7 +102,7 @@ int main(int argc, char** argv)
             {
                 float2 uv = float2(i, j) / float2(height, width);
                 uv = uv * s;
-                float f = noise2(hashname, uv) * 0.5f + 0.5f;
+                float f = noise2(hashname, uv, uint2(a, b)) * 0.5f + 0.5f;
 
                 pixels[3 * (j * width + i) + 0] = uint8_t(f * 255u);
                 pixels[3 * (j * width + i) + 1] = uint8_t(f * 255u);

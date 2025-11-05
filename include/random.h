@@ -70,6 +70,9 @@ uint seed4(uint4 p) {
     return 19u * p.x + 47u * p.y + 101u * p.z + 131u * p.w + 173u;
 }
 
+uint newseed(uint2 p) {
+    return p.x * 1664525u + p.y * 16807u + 1013904223u;
+}
 
 // Hashes
 

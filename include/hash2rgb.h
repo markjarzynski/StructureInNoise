@@ -19,6 +19,11 @@ uint32_t hash2rgb(char* hashname, uint x, uint y)
     {                                       \
         uint h = HASH(HASH(x) + y);         \
         return h;              \
+    }                                       \
+    else if (strcmp(hashname, #HASH "_newlinear") == 0) \
+    {                                       \
+        uint h = HASH(newseed(uint2(x,y))); \
+        return h;                           \
     }
 
 #define ELSEIF12(HASH)                      \

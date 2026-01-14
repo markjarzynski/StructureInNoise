@@ -297,12 +297,38 @@ uint32_t hash2rgb(char* hashname, uint x, uint y)
     ELSEIF33(pcg3d)
     ELSEIF33(pcg3d16)
     ELSEIF44(pcg4d)
+    ELSEIF44(pcg4d2)
     ELSEIF12f(pseudo)
     ELSEIF11(ranlim32)
     ELSEIF12_(superfast, superfast_2)
     ELSEIF13_(superfast, superfast_3)
     ELSEIF14_(superfast, superfast_4)
+
+
+
+#define ELSEIFTEA(N)                        \
+    else if (strcmp(hashname, "tea" #N) == 0)  \
+    {                                       \
+        uint2 h = tea(N, uint2(x, y));     \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, "tea" #N ".x") == 0)  \
+    {                                       \
+        uint2 h = tea(N, uint2(x, y));     \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, "tea" #N ".y") == 0)  \
+    {                                       \
+        uint2 h = tea(N, uint2(x, y));     \
+        return h.y;                         \
+    }
     
+    ELSEIFTEA(2)
+    ELSEIFTEA(3)
+    ELSEIFTEA(4)
+    ELSEIFTEA(5)
+
+    /*
     else if (strcmp(hashname, "tea2") == 0)
     {
         uint2 h = tea(2, uint2(x,y));
@@ -323,6 +349,7 @@ uint32_t hash2rgb(char* hashname, uint x, uint y)
         uint2 h = tea(5, uint2(x,y));
         return h.x;
     }
+    */
     
     ELSEIF12f(trig)
     ELSEIF11(wang)

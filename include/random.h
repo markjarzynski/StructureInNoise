@@ -70,7 +70,7 @@ uint seed4(uint4 p) {
     return 19u * p.x + 47u * p.y + 101u * p.z + 131u * p.w + 173u;
 }
 
-uint newseed(uint2 p) {
+uint lincomb(uint2 p) {
     return p.x * 1664525u + p.y * 16807u + 1013904223u;
 }
 
@@ -1031,6 +1031,25 @@ uint4 pcg4d(uint4 v)
     return v;
     
     */
+}
+
+uint4 pcg4d2(uint4 v)
+{
+    v = v * 1664525u + 1013904223u;
+
+    v.x += v.z*v.w;
+    v.y += v.w*v.x;
+    v.z += v.x*v.y;
+    v.w += v.y*v.z;
+
+    v = v ^ (v >> 16u);
+
+    v.x += v.z*v.w;
+    v.y += v.w*v.x;
+    v.z += v.x*v.y;
+    v.w += v.y*v.z;
+
+    return v;
 }
 
 uint2 pcg2d(uint2 v)

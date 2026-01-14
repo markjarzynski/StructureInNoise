@@ -22,7 +22,7 @@ uint32_t hash2rgb(char* hashname, uint x, uint y)
     }                                       \
     else if (strcmp(hashname, #HASH "_lincomb") == 0) \
     {                                       \
-        uint h = HASH(newseed(uint2(x,y))); \
+        uint h = HASH(lincomb(uint2(x,y))); \
         return h;                           \
     }
 

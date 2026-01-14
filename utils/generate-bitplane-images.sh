@@ -5,7 +5,7 @@ hashes=(city_2 city_3 city_4 esgtsa_lincomb esgtsa_linear esgtsa_nested fast hyb
 width=256
 height=128
 
-dir=images/bitplanes
+dir=images/bitplane
 
 mkdir -p $dir
 

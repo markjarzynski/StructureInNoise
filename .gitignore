@@ -2,6 +2,7 @@
 
 structure-in-noise
 rng2img
+rng2noise
 
 *.ppm
 *.png

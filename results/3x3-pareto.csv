@@ -1,0 +1,9 @@
+10.335,3405681,2,jkiss32
+28.295,2104098,14,xoshiro128starstar
+40.599,513765,29,iqint1_linear
+41.206,491530,16,iqint1_lincomb
+58.830,491328,16,iqint1_nested
+81.804,491278,15,newintegerhash_lincomb
+117.218,491209,17,prospector_best_nested
+165.084,491159,8,iqint2.z
+240.528,491047,21,tea4

@@ -1,0 +1,10 @@
+10.335,1392916,2,jkiss32
+28.295,500598,13,xoshiro128starstar
+40.599,25598,31,iqint1_linear
+41.206,3672,17,iqint1_lincomb
+52.651,3671,14,pcg_lincomb
+52.831,3669,23,iqint3
+68.752,3665,4,pxq_lincomb
+69.648,3664,12,prospector_best_lincomb
+82.964,3633,16,pcg2d
+104.928,3616,3,pixar_randfloat

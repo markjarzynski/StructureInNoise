@@ -33,4 +33,4 @@ clean:
 	rm -rf *.ppm *.png
 
 clobber: clean
-	rm -rf structure-in-noise rng2img
+	rm -rf structure-in-noise rng2img rng2noise

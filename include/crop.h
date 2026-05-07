@@ -25,13 +25,19 @@ int crop(uint8_t* pixels, int width, int height, uint8_t* kernel, int x, int y, 
     return 1;
 }
 
-int crop(uint32_t* pixels, int width, int height, uint32_t* kernel, int x, int y, int w, int h)
+int crop(uint32_t* pixels, int bwidth, int bheight, int bdepth, int btrength, uint32_t* crop, int cx, int cy, int cz, int cw, int cwidth, int cheight, int cdepth, int ctrength)
 {
-    for (int i = 0; i < h; i++)
+    for (int i = 0; i < cheight; i++)
     {
-        for (int j = 0; j < w; j++)
+        for (int j = 0; j < cwidth; j++)
         {
-            kernel[i * w + j] = pixels[width * (y + i) + x + j];
+            for (int k = 0; k < cdepth; k++)
+            {
+                for (int l = 0; l < ctrength; l++)
+                {
+                    crop[((i * cwidth + j) * cdepth + k) * ctrength + l] = pixels[(((cy + i) * bwidth + cx + j) * bdepth + cz + k) * btrength + cw + l];
+                }
+            }
         }
     }
 

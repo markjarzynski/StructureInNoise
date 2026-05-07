@@ -62,16 +62,24 @@ uint seed(uint2 p) {
 }
 
 // convert 3D seed to 1D
-uint seed3(uint3 p) {
+uint seed(uint3 p) {
     return 19u * p.x + 47u * p.y + 101u * p.z + 131u;
 }
 
-uint seed4(uint4 p) {
+uint seed(uint4 p) {
     return 19u * p.x + 47u * p.y + 101u * p.z + 131u * p.w + 173u;
 }
 
 uint lincomb(uint2 p) {
     return p.x * 1664525u + p.y * 16807u + 1013904223u;
+}
+
+uint lincomb(uint3 p) {
+    return p.x * 1664525u + p.y * 16807u + p.x * 22695477 + 1013904223u;
+}
+
+uint lincomb(uint4 p) {
+    return p.x * 1664525u + p.y * 16807u + p.x * 22695477 + p.w * 134775813 + 1013904223u;
 }
 
 // Hashes

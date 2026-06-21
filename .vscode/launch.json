@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug with GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            // Path to the executable produced by your Makefile
+            "program": "${workspaceFolder}/hashtable-test", 
+            "args": [
+                "lcg_linear2",
+                //"-w", "8", "-h", "8", "-d", "1", "-t", "1",
+                //"-i", "3", "-j", "3", "-k", "1", "-l", "1",
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            // This matches the label in tasks.json
+            "preLaunchTask": "build with make", 
+            "miDebuggerPath": "/usr/bin/gdb" 
+        }
+    ]
+}

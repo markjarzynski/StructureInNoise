@@ -1,7 +1,11 @@
 CXX :=g++
-CXXFLAGS := -Wall -Wextra -O3
+CXXFLAGS := -Wall -Wextra
 TARGET := structure-in-noise
-SRC := structure-in-noise.cpp
+
+DEBUG_FLAGS := -g -O0 -DDEBUG
+RELEASE_FLAGS := -O3 -DNDEBUG
+
+SRC := fft-test.cpp
 OBJ := $(SRC:.cpp=.o)
 
 all: structure-in-noise
@@ -15,6 +19,12 @@ rng2img: rng2img.cpp include/*.h
 rng2noise: rng2noise.cpp include/*.h
 	$(CXX) $(CXXFLAGS) -I include -o rng2noise rng2noise.cpp
 
+fft-test: fft-test.cpp include/*.h
+	$(CXX) $(CXXFLAGS) $(DEBUG_FLAGS) -I include -o fft-test fft-test.cpp -lfftw3 -lm
+
+hashtable-test: hashtable-test.cpp include/*.h
+	$(CXX) $(CXXFLAGS) $(DEBUG_FLAGS) -I include -o hashtable-test hashtable-test.cpp
+	
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 

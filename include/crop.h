@@ -43,3 +43,23 @@ int crop(uint32_t* pixels, int bwidth, int bheight, int bdepth, int btrength, ui
 
     return 1;
 }
+
+int crop(uint32_t* pixels, int bwidth, int bheight, int bdepth, int btrength, uint8_t* crop, int cx, int cy, int cz, int cw, int cwidth, int cheight, int cdepth, int ctrength, int bitshift)
+{
+    for (int i = 0; i < cheight; i++)
+    {
+        for (int j = 0; j < cwidth; j++)
+        {
+            for (int k = 0; k < cdepth; k++)
+            {
+                for (int l = 0; l < ctrength; l++)
+                {
+                    uint32_t p = pixels[(((cy + i) * bwidth + cx + j) * bdepth + cz + k) * btrength + cw + l];
+                    crop[((i * cwidth + j) * cdepth + k) * ctrength + l] = (p >> bitshift) & 1u;
+                }
+            }
+        }
+    }
+
+    return 1;
+}

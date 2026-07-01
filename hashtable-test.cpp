@@ -164,6 +164,20 @@ int main(int argc, char** argv)
     int nsize = nheight * nwidth * ndepth * ntrength; // neighborhood size
     std::vector<uint8_t> neighborhood(nsize);
 
+    typedef std::unordered_map<size_t, size_t> bit_map;
+    bit_map bit_maps[BITS];
+
+    auto insert = [&bit_maps](const std::vector<uint8_t>& neighborhood, int bit_index) {
+        size_t hash = Hash{}(neighborhood);
+        auto& bit_map = bit_maps[bit_index];
+
+        if (bit_map.find(hash) == bit_map.end())
+            bit_map.insert({ hash, 1 });
+        else
+            bit_map[hash] = bit_map[hash] + 1;
+    };
+
+    /*
     typedef std::unordered_map<size_t, std::vector<std::pair<std::vector<uint8_t>, size_t>>> bit_map;
     std::vector<bit_map> bit_maps(end - start);
 
@@ -183,9 +197,10 @@ int main(int argc, char** argv)
 
         bucket.push_back({ neighborhood, 1 });
     };
+    */
 
     uint64_t bit_matches[BITS] = { 0 };
-
+    //uint64_t bit_matches2[BITS] = { 0 };
 
     for (int b = start; b < end; b++)
     {
@@ -222,14 +237,16 @@ int main(int argc, char** argv)
                             }
                         }
                         
+                        //insert(neighborhood, b - start);
                         insert(neighborhood, b - start);
                     }
                 }
             }
         }
 
-        printf("rank %d done inserting into hash table.\n", world_rank);
+        //printf("rank %d done inserting into hash table.\n", world_rank);
 
+        /*
         for (const auto& [hash, bucket] : bit_maps[b - start])
         {
             for (const auto& [entry, count] : bucket)
@@ -240,8 +257,19 @@ int main(int argc, char** argv)
                 }
             }
         }
+        */
+        
+        for (const auto& [hash, count] : bit_maps[b - start])
+        {
+            if (count > 1)
+            {
+                bit_matches[b] += (uint64_t)count * (uint64_t)(count - 1);
+            }
+        }
+        
 
-        printf("bit: %d, matches: %" PRIu64 "\n", b, bit_matches[b]);
+        //printf("bit: %d, matches: %" PRIu64 "\n", b, bit_matches[b]);
+        //printf("bit: %d, matches: %" PRIu64 "\n", b, bit_matches2[b]);
     }
 
 #if defined(USE_MPI)
@@ -275,6 +303,17 @@ int main(int argc, char** argv)
         }
 
         printf("\n");
+
+        /*
+        printf("%s", hashname);
+
+        for (int b = 0; b < BITS; b++)
+        {
+            printf(",%" PRIu64, bit_matches2[b]);
+        }
+
+        printf("\n");
+        */
     }
 
 #if defined(USE_MPI)

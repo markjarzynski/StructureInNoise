@@ -25,14 +25,15 @@
 #define BITS 32
 
 static struct option long_options[] = {
-    {"width",   optional_argument, 0, 'w'},
-    {"height",  optional_argument, 0, 'h'},
-    {"depth",   optional_argument, 0, 'd'},
-    {"trength", optional_argument, 0, 't'},
+    {"width",    optional_argument, 0, 'w'},
+    {"height",   optional_argument, 0, 'h'},
+    {"depth",    optional_argument, 0, 'd'},
+    {"trength",  optional_argument, 0, 't'},
     {"nwidth",   optional_argument, 0, 'i'},
     {"nheight",  optional_argument, 0, 'j'},
     {"ndepth",   optional_argument, 0, 'k'},
     {"ntrength", optional_argument, 0, 'l'},
+    {"bit",      optional_argument, 0, 'b'}
 };
 
 int usage(char* name);
@@ -60,6 +61,7 @@ int main(int argc, char** argv)
     int bheight = 128, bwidth = 128, bdepth = 1, btrength = 1;
     int xi = 0, yi = 0, zi = 0, wi = 0;
     int nheight = 5, nwidth = 5, ndepth = 1, ntrength = 1;
+    int bit = 0;
 
     struct timeval current_time;
     gettimeofday(&current_time, NULL);
@@ -68,8 +70,8 @@ int main(int argc, char** argv)
     char* hashname = NULL;
     char* filename = NULL;
 
-    int c, fflag = 0, option_index = 0;
-    while ((c = getopt_long(argc, argv, "x:y:z:v:rw:h:d:t:i:j:k:l:f:", long_options, &option_index)) != -1)
+    int c, fflag = 0, option_index = 0, bflag = 0;
+    while ((c = getopt_long(argc, argv, "x:y:z:v:rw:h:d:t:i:j:k:l:f:b:", long_options, &option_index)) != -1)
     {
         switch (c)
         {
@@ -119,6 +121,10 @@ int main(int argc, char** argv)
             fflag = 1;
             filename = optarg;
             break;
+        case 'b':
+            bit = atoi(optarg);
+            bflag = 1;
+            break;
         }
     }
 
@@ -158,8 +164,31 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    int start = world_rank * (BITS) / world_size;
-    int end = (world_rank + 1) * (BITS) / world_size;
+    int bstart = 0;
+    int bend = BITS;
+
+    int ystart = 0;
+    int yend = bheight - nheight + 1;
+
+    if (bflag)
+    {
+        bstart = bit;
+        bend = bit + 1;
+
+        if (world_size > 1)
+        {
+            ystart = world_rank * (bheight - nheight + 1) / world_size;
+            yend = (world_rank + 1) * (bheight - nheight + 1) / world_size;
+        }
+    }
+    else
+    {
+        if (world_size > 1)
+        {
+            bstart = world_rank * (BITS) / world_size;
+            bend = (world_rank + 1) * (BITS) / world_size;
+        }
+    }
 
     int nsize = nheight * nwidth * ndepth * ntrength; // neighborhood size
     std::vector<uint8_t> neighborhood(nsize);
@@ -202,9 +231,9 @@ int main(int argc, char** argv)
     uint64_t bit_matches[BITS] = { 0 };
     //uint64_t bit_matches2[BITS] = { 0 };
 
-    for (int b = start; b < end; b++)
+    for (int b = bstart; b < bend; b++)
     {
-        for (int ny1 = 0; ny1 < bheight - nheight + 1; ny1++)
+        for (int ny1 = ystart; ny1 < yend; ny1++)
         {
             for (int nx1 = 0; nx1 < bwidth - nwidth + 1; nx1++)
             {
@@ -238,7 +267,7 @@ int main(int argc, char** argv)
                         }
                         
                         //insert(neighborhood, b - start);
-                        insert(neighborhood, b - start);
+                        insert(neighborhood, b - bstart);
                     }
                 }
             }
@@ -247,7 +276,7 @@ int main(int argc, char** argv)
         //printf("rank %d done inserting into hash table.\n", world_rank);
 
         /*
-        for (const auto& [hash, bucket] : bit_maps[b - start])
+        for (const auto& [hash, bucket] : bit_maps[b - bstart])
         {
             for (const auto& [entry, count] : bucket)
             {
@@ -259,7 +288,7 @@ int main(int argc, char** argv)
         }
         */
         
-        for (const auto& [hash, count] : bit_maps[b - start])
+        for (const auto& [hash, count] : bit_maps[b - bstart])
         {
             if (count > 1)
             {
@@ -273,21 +302,44 @@ int main(int argc, char** argv)
     }
 
 #if defined(USE_MPI)
-    uint64_t* world_bit_matches = NULL;
-    if (world_rank == 0)
+    if (bflag)
     {
-        world_bit_matches = (uint64_t*)malloc(sizeof(uint64_t) * world_size * BITS);
-    }
-
-    MPI_Gather(bit_matches, BITS, MPI_UINT64_T, world_bit_matches, BITS, MPI_UINT64_T, 0, MPI_COMM_WORLD);
-
-    if (world_rank == 0)
-    {
-        for (int i = 1; i < world_size; i++)
+        size_t* world_bit_maps_size = NULL;
+        if (world_rank == 0)
         {
-            for (int b = 0; b < BITS; b++)
+            world_bit_maps_size = (size_t*)malloc(sizeof(size_t) * world_size);
+        }
+
+        MPI_Gather(&bit_maps[0].size(), 1, MPI_UINT64_T, world_bit_maps_size, 1, MPI_UINT64_T, 0, MPI_COMM_WORLD);
+
+        if (world_rank == 0)
+        {
+            printf("bit_maps_size");
+            for (int i = 0; i < world_size; i++)
             {
-                bit_matches[b] += world_bit_matches[i * BITS + b];
+                printf(",%zu", world_bit_maps_size[i]);
+            }
+            printf("\n");
+        }
+    }
+    else
+    {
+        uint64_t* world_bit_matches = NULL;
+        if (world_rank == 0)
+        {
+            world_bit_matches = (uint64_t*)malloc(sizeof(uint64_t) * world_size * BITS);
+        }
+
+        MPI_Gather(bit_matches, BITS, MPI_UINT64_T, world_bit_matches, BITS, MPI_UINT64_T, 0, MPI_COMM_WORLD);
+
+        if (world_rank == 0)
+        {
+            for (int i = 1; i < world_size; i++)
+            {
+                for (int b = 0; b < BITS; b++)
+                {
+                    bit_matches[b] += world_bit_matches[i * BITS + b];
+                }
             }
         }
     }

@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
+#define USE_MPI
 #if defined(USE_MPI)
 #include <mpi.h>
 #endif
@@ -300,27 +301,39 @@ int main(int argc, char** argv)
         //printf("bit: %d, matches: %" PRIu64 "\n", b, bit_matches[b]);
         //printf("bit: %d, matches: %" PRIu64 "\n", b, bit_matches2[b]);
     }
-
 #if defined(USE_MPI)
     if (bflag)
     {
-        size_t* world_bit_maps_size = NULL;
-        if (world_rank == 0)
+        // convert unordered_map bit_maps to size_t array
+        std::vector<std::pair<size_t, size_t>> bit_maps_vec;
+        for (const auto& [hash, count] : bit_maps[0])
         {
-            world_bit_maps_size = (size_t*)malloc(sizeof(size_t) * world_size);
+            bit_maps_vec.push_back({ hash, count });
         }
 
-        MPI_Gather(&bit_maps[0].size(), 1, MPI_UINT64_T, world_bit_maps_size, 1, MPI_UINT64_T, 0, MPI_COMM_WORLD);
+        int size = bit_maps_vec.size();
+
+        int* world_bit_maps_size = NULL;
+        if (world_rank == 0)
+        {
+            world_bit_maps_size = (int*)malloc(sizeof(int) * world_size);
+        }
+
+        MPI_Gather(&size, 1, MPI_INT, world_bit_maps_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
         if (world_rank == 0)
         {
             printf("bit_maps_size");
             for (int i = 0; i < world_size; i++)
             {
-                printf(",%zu", world_bit_maps_size[i]);
+                printf(",%d", world_bit_maps_size[i]);
             }
             printf("\n");
         }
+
+        std::vector<std::vector<std::pair<size_t, size_t>>> world_bit_maps_vec(world_size);
+        MPI_Gatherv(bit_maps_vec.data(), bit_maps_vec.size(), MPI_UINT64_T, world_bit_maps_vec.data(), world_bit_maps_size, NULL, MPI_UINT64_T, 0, MPI_COMM_WORLD);
+
     }
     else
     {

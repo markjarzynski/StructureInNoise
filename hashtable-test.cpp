@@ -6,6 +6,7 @@
 #include <getopt.h>
 #include <unordered_map>
 #include <vector>
+#include <stddef.h>
 
 #define USE_MPI
 #if defined(USE_MPI)
@@ -34,7 +35,8 @@ static struct option long_options[] = {
     {"nheight",  optional_argument, 0, 'j'},
     {"ndepth",   optional_argument, 0, 'k'},
     {"ntrength", optional_argument, 0, 'l'},
-    {"bit",      optional_argument, 0, 'b'}
+    {"bit",      optional_argument, 0, 'b'},
+    {"verbose",  no_argument,       0, 'v'}
 };
 
 int usage(char* name);
@@ -45,7 +47,7 @@ struct Hash
     {
         size_t hash = 0;
 
-        for (const uint32_t& i : v)
+        for (const uint8_t& i : v)
         {
             hash ^= (size_t)std::hash<uint8_t>{}(i) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
         }
@@ -64,6 +66,8 @@ int main(int argc, char** argv)
     int nheight = 5, nwidth = 5, ndepth = 1, ntrength = 1;
     int bit = 0;
 
+    bool verbose = false;
+
     struct timeval current_time;
     gettimeofday(&current_time, NULL);
     uint time = current_time.tv_sec * 1000000 + current_time.tv_usec;
@@ -72,7 +76,7 @@ int main(int argc, char** argv)
     char* filename = NULL;
 
     int c, fflag = 0, option_index = 0, bflag = 0;
-    while ((c = getopt_long(argc, argv, "x:y:z:v:rw:h:d:t:i:j:k:l:f:b:", long_options, &option_index)) != -1)
+    while ((c = getopt_long(argc, argv, "x:y:z:u:rw:h:d:t:i:j:k:l:f:b:v", long_options, &option_index)) != -1)
     {
         switch (c)
         {
@@ -85,7 +89,7 @@ int main(int argc, char** argv)
         case 'z': // initial z position
             zi = atoi(optarg);
             break;
-        case 'v': // initial w position
+        case 'u': // initial w position
             wi = atoi(optarg);
             break;
         case 'r': // use random x/y positions
@@ -126,6 +130,9 @@ int main(int argc, char** argv)
             bit = atoi(optarg);
             bflag = 1;
             break;
+        case 'v':
+            verbose = true;
+            break;
         }
     }
 
@@ -156,7 +163,10 @@ int main(int argc, char** argv)
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 #endif
 
-    //printf("World size: %d, rank: %d\n", world_size, world_rank);
+    if (verbose)
+    {
+        printf("World size: %d, rank: %d\n", world_size, world_rank);
+    }
 
     // check to ensure world_size is a power of 2
     if (!(world_size > 0 && !(world_size & (world_size - 1))))
@@ -267,46 +277,37 @@ int main(int argc, char** argv)
                             }
                         }
                         
-                        //insert(neighborhood, b - start);
-                        insert(neighborhood, b - bstart);
+                        insert(neighborhood, b);
                     }
                 }
             }
         }
 
-        //printf("rank %d done inserting into hash table.\n", world_rank);
-
-        /*
-        for (const auto& [hash, bucket] : bit_maps[b - bstart])
-        {
-            for (const auto& [entry, count] : bucket)
-            {
-                if (count > 1)
-                {
-                    bit_matches[b] += (uint64_t)count * (uint64_t)(count - 1);
-                }
-            }
-        }
-        */
-        
-        for (const auto& [hash, count] : bit_maps[b - bstart])
-        {
-            if (count > 1)
-            {
-                bit_matches[b] += (uint64_t)count * (uint64_t)(count - 1);
-            }
-        }
-        
-
-        //printf("bit: %d, matches: %" PRIu64 "\n", b, bit_matches[b]);
-        //printf("bit: %d, matches: %" PRIu64 "\n", b, bit_matches2[b]);
+        if (verbose)
+            printf("rank %d done inserting into hash table for bit %d.\n", world_rank, b);
     }
 #if defined(USE_MPI)
     if (bflag)
     {
+
+        struct KeyValue
+        {
+            size_t key;
+            size_t value;
+        };
+
+        MPI_Datatype KeyValueTypes[2] = { MPI_UINT64_T, MPI_UINT64_T };
+        int KeyValueBlocklen[2] = { 1, 1 };
+        MPI_Aint KeyValueOffsets[2];
+        KeyValueOffsets[0] = offsetof(KeyValue, key);
+        KeyValueOffsets[1] = offsetof(KeyValue, value);
+        MPI_Datatype KeyValueMPIType;
+        MPI_Type_create_struct(2, KeyValueBlocklen, KeyValueOffsets, KeyValueTypes, &KeyValueMPIType);
+        MPI_Type_commit(&KeyValueMPIType);
+
         // convert unordered_map bit_maps to size_t array
-        std::vector<std::pair<size_t, size_t>> bit_maps_vec;
-        for (const auto& [hash, count] : bit_maps[0])
+        std::vector<KeyValue> bit_maps_vec;
+        for (const auto& [hash, count] : bit_maps[bstart])
         {
             bit_maps_vec.push_back({ hash, count });
         }
@@ -314,29 +315,81 @@ int main(int argc, char** argv)
         int size = bit_maps_vec.size();
 
         int* world_bit_maps_size = NULL;
+        int* world_bit_maps_displs = NULL;
         if (world_rank == 0)
         {
             world_bit_maps_size = (int*)malloc(sizeof(int) * world_size);
+            world_bit_maps_displs = (int*)malloc(sizeof(int) * world_size);
         }
 
         MPI_Gather(&size, 1, MPI_INT, world_bit_maps_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
+        std::vector<KeyValue> world_bit_maps_vec;
         if (world_rank == 0)
         {
-            printf("bit_maps_size");
+            size_t total_size = 0;
             for (int i = 0; i < world_size; i++)
             {
-                printf(",%d", world_bit_maps_size[i]);
+                total_size += world_bit_maps_size[i];
+                world_bit_maps_displs[i] = total_size - world_bit_maps_size[i];
             }
-            printf("\n");
+            world_bit_maps_vec.resize(total_size);
         }
 
-        std::vector<std::vector<std::pair<size_t, size_t>>> world_bit_maps_vec(world_size);
-        MPI_Gatherv(bit_maps_vec.data(), bit_maps_vec.size(), MPI_UINT64_T, world_bit_maps_vec.data(), world_bit_maps_size, NULL, MPI_UINT64_T, 0, MPI_COMM_WORLD);
+        MPI_Gatherv(bit_maps_vec.data(), bit_maps_vec.size(), KeyValueMPIType, world_bit_maps_vec.data(), world_bit_maps_size, world_bit_maps_displs, KeyValueMPIType, 0, MPI_COMM_WORLD);
 
+        if (world_rank == 0)
+        {
+             for (uint32_t i = world_bit_maps_displs[1]; i < world_bit_maps_vec.size(); i++)
+            {
+                const KeyValue& kv = world_bit_maps_vec[i];
+                size_t hash = kv.key;
+                size_t count = kv.value;
+                
+                if (bit_maps[bstart].find(hash) == bit_maps[bstart].end())
+                    bit_maps[bstart].insert({ hash, count });
+                else
+                    bit_maps[bstart][hash] = bit_maps[bstart][hash] + count;
+            }
+        }
+
+        if (world_rank == 0)
+        {
+            for (int b = 0; b < BITS; b++)
+            {            
+                for (const auto& [hash, count] : bit_maps[b])
+                {
+                    if (count > 1)
+                    {
+                        bit_matches[b] += (uint64_t)count * (uint64_t)(count - 1);
+                    }
+                }
+                
+                if (verbose)
+                {
+                    printf("bit: %d, matches: %" PRIu64 "\n", b, bit_matches[b]);
+                }
+            }
+        }
     }
     else
     {
+        for (int b = bstart; b < bend; b++)
+        {            
+            for (const auto& [hash, count] : bit_maps[b])
+            {
+                if (count > 1)
+                {
+                    bit_matches[b] += (uint64_t)count * (uint64_t)(count - 1);
+                }
+            }
+            
+            if (verbose)
+            {
+                printf("bit: %d, matches: %" PRIu64 "\n", b, bit_matches[b]);
+            }
+        }
+
         uint64_t* world_bit_matches = NULL;
         if (world_rank == 0)
         {
@@ -368,17 +421,6 @@ int main(int argc, char** argv)
         }
 
         printf("\n");
-
-        /*
-        printf("%s", hashname);
-
-        for (int b = 0; b < BITS; b++)
-        {
-            printf(",%" PRIu64, bit_matches2[b]);
-        }
-
-        printf("\n");
-        */
     }
 
 #if defined(USE_MPI)

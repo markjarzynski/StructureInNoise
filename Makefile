@@ -1,4 +1,5 @@
 CXX :=g++
+MPICXX :=mpicxx
 CXXFLAGS := -Wall -Wextra
 TARGET := structure-in-noise
 
@@ -23,7 +24,7 @@ fft-test: fft-test.cpp include/*.h
 	$(CXX) $(CXXFLAGS) $(DEBUG_FLAGS) -I include -o fft-test fft-test.cpp -lfftw3 -lm
 
 hashtable-test: hashtable-test.cpp include/*.h
-	$(CXX) $(CXXFLAGS) $(DEBUG_FLAGS) -I include -o hashtable-test hashtable-test.cpp
+	$(MPICXX) $(CXXFLAGS) $(DEBUG_FLAGS) -I include -o hashtable-test hashtable-test.cpp -DUSE_MPI
 	
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

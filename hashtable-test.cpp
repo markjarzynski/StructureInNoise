@@ -7,13 +7,12 @@
 #include <unordered_map>
 #include <vector>
 #include <stddef.h>
+#include <string>
 
-#define USE_MPI
 #if defined(USE_MPI)
 #include <mpi.h>
 #endif
 
-#include "uint3.h"
 #include "random.h"
 #include "hash2rgb.h"
 #include "bitshift.h"
@@ -62,7 +61,7 @@ int main(int argc, char** argv)
         return usage(argv[0]);
 
     int bheight = 128, bwidth = 128, bdepth = 1, btrength = 1;
-    int xi = 0, yi = 0, zi = 0, wi = 0;
+    uint32_t xi = 0, yi = 0, zi = 0, wi = 0;
     int nheight = 5, nwidth = 5, ndepth = 1, ntrength = 1;
     int bit = 0;
 
@@ -81,16 +80,16 @@ int main(int argc, char** argv)
         switch (c)
         {
         case 'x': // initial x position
-            xi = atoi(optarg);
+            xi = std::stoul(optarg);
             break;
         case 'y': // initial y position
-            yi = atoi(optarg);
+            yi = std::stoul(optarg);
             break;
         case 'z': // initial z position
-            zi = atoi(optarg);
+            zi = std::stoul(optarg);
             break;
         case 'u': // initial w position
-            wi = atoi(optarg);
+            wi = std::stoul(optarg);
             break;
         case 'r': // use random x/y positions
             xi = pcg(time);
@@ -153,6 +152,19 @@ int main(int argc, char** argv)
     {
         hashname = argv[argc - 1];
     }
+
+    // print input arguments such that test can be reexecuted with the same parameters
+    printf("-x %u -y %u -z %u -u %u ", xi, yi, zi, wi);
+    printf("-w %d -h %d -d %d -t %d ", bwidth, bheight, bdepth, btrength);
+    printf("-i %d -j %d -k %d -l %d ", nwidth, nheight, ndepth, ntrength);
+    if (bflag)
+        printf("-b %d ", bit);
+    if (verbose)
+        printf("-v ");
+    if (fflag)
+        printf("-f %s\n", filename);
+    else
+        printf("%s\n", hashname);
 
     int world_size = 1, world_rank = 0;
 

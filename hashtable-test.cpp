@@ -153,18 +153,6 @@ int main(int argc, char** argv)
         hashname = argv[argc - 1];
     }
 
-    // print input arguments such that test can be reexecuted with the same parameters
-    printf("-x %u -y %u -z %u -u %u ", xi, yi, zi, wi);
-    printf("-w %d -h %d -d %d -t %d ", bwidth, bheight, bdepth, btrength);
-    printf("-i %d -j %d -k %d -l %d ", nwidth, nheight, ndepth, ntrength);
-    if (bflag)
-        printf("-b %d ", bit);
-    if (verbose)
-        printf("-v ");
-    if (fflag)
-        printf("-f %s\n", filename);
-    else
-        printf("%s\n", hashname);
 
     int world_size = 1, world_rank = 0;
 
@@ -175,9 +163,26 @@ int main(int argc, char** argv)
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 #endif
 
-    if (verbose)
+    if (world_rank == 0)
     {
-        printf("World size: %d, rank: %d\n", world_size, world_rank);
+        // print input arguments such that test can be reexecuted with the same parameters
+
+        printf("-x %u -y %u -z %u -u %u ", xi, yi, zi, wi);
+        printf("-w %d -h %d -d %d -t %d ", bwidth, bheight, bdepth, btrength);
+        printf("-i %d -j %d -k %d -l %d ", nwidth, nheight, ndepth, ntrength);
+        if (bflag)
+            printf("-b %d ", bit);
+        if (verbose)
+            printf("-v ");
+        if (fflag)
+            printf("-f %s\n", filename);
+        else
+            printf("%s\n", hashname);
+
+        if (verbose)
+        {
+            printf("World size: %d, rank: %d\n", world_size, world_rank);
+        }
     }
 
     // check to ensure world_size is a power of 2

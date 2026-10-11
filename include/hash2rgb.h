@@ -82,6 +82,13 @@ uint32_t hash2rgb(char* hashname, uint x, uint y, uint z, uint w)
         return h;                           \
     }
 
+#define ELSEIF11_(HASH,NAME)                \
+    else if (strcmp(hashname, #NAME) == 0)  \
+    {                                       \
+        uint h = HASH(x);                   \
+        return h;                           \
+    }
+
 #define ELSEIF12_(HASH,NAME)                \
     else if (strcmp(hashname, #NAME) == 0)  \
     {                                       \
@@ -220,6 +227,33 @@ uint32_t hash2rgb(char* hashname, uint x, uint y, uint z, uint w)
         return h.z;                         \
     }
 
+#define ELSEIF41(HASH)                      \
+    else if (strcmp(hashname, #HASH) == 0)  \
+    {                                       \
+        uint4 h = HASH(x);                  \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".x") == 0) \
+    {                                       \
+        uint4 h = HASH(x);                  \
+        return h.x;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".y") == 0) \
+    {                                       \
+        uint4 h = HASH(x);                  \
+        return h.y;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".z") == 0) \
+    {                                       \
+        uint4 h = HASH(x);                  \
+        return h.z;                         \
+    }                                       \
+    else if (strcmp(hashname, #HASH ".w") == 0) \
+    {                                       \
+        uint4 h = HASH(x);                  \
+        return h.w;                         \
+    }
+
 #define ELSEIF42(HASH)                      \
     else if (strcmp(hashname, #HASH) == 0)  \
     {                                       \
@@ -310,6 +344,7 @@ uint32_t hash2rgb(char* hashname, uint x, uint y, uint z, uint w)
     }
 
     ELSEIF11(bbs)
+    ELSEIF11_(city, city_1)
     ELSEIF12_(city, city_2)
     ELSEIF13_(city, city_3)
     ELSEIF14_(city, city_4)
@@ -321,9 +356,11 @@ uint32_t hash2rgb(char* hashname, uint x, uint y, uint z, uint w)
     ELSEIF12(iqint3)
     ELSEIF12(jkiss32)
     ELSEIF11(lcg)
+    ELSEIF41(md5_1)
     ELSEIF42(md5_2)
     ELSEIF43(md5_3)
     ELSEIF44(md5)
+    ELSEIF11_(murmur3, murmur3_1)
     ELSEIF12_(murmur3, murmur3_2)
     ELSEIF13_(murmur3, murmur3_3)
     ELSEIF14_(murmur3, murmur3_4)
@@ -335,6 +372,7 @@ uint32_t hash2rgb(char* hashname, uint x, uint y, uint z, uint w)
     ELSEIF44(pcg4d2)
     ELSEIF12f(pseudo)
     ELSEIF11(ranlim32)
+    ELSEIF11_(superfast, superfast_1)
     ELSEIF12_(superfast, superfast_2)
     ELSEIF13_(superfast, superfast_3)
     ELSEIF14_(superfast, superfast_4)
@@ -367,6 +405,7 @@ uint32_t hash2rgb(char* hashname, uint x, uint y, uint z, uint w)
     ELSEIF11(wang)
     ELSEIF44(xorshift128)
     ELSEIF11(xorshift32)
+    ELSEIF11_(xxhash32, xxhash32_1)
     ELSEIF12_(xxhash32, xxhash32_2)
     ELSEIF13_(xxhash32, xxhash32_3)
     ELSEIF14_(xxhash32, xxhash32_4)
@@ -378,6 +417,7 @@ uint32_t hash2rgb(char* hashname, uint x, uint y, uint z, uint w)
     ELSEIF11(pxq)
     ELSEIF11(newintegerhash)
     ELSEIF11(prospector_best)
+    ELSEIF11_(one_at_a_time_1, one_at_a_time_1)
     ELSEIF12(one_at_a_time_2)
     ELSEIF13(one_at_a_time_3)
     ELSEIF14(one_at_a_time_4)
@@ -413,6 +453,7 @@ uint32_t hash2rgb(char* hashname, uint x, uint y, uint z, uint w)
 #undef ELSEIF12
 #undef ELSEIF13
 #undef ELSEIF14
+#undef ELSEIF11_
 #undef ELSEIF12_
 #undef ELSEIF13_
 #undef ELSEIF14_

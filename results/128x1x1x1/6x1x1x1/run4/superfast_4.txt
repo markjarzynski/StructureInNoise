@@ -1,0 +1,3 @@
+-x 333486209 -y 3022919687 -z 3310184031 -u 3522294582 -w 128 -h 1 -d 1 -t 1 -i 6 -j 1 -k 1 -l 1 superfast_4
+[1786642740.066466] [c18-46:632765:0]          select.c:629  UCX  ERROR   no auxiliary transport to <no debug data>: Unsupported operation
+[1786642740.068005] [c18-46:632765:0]          select.c:629  UCX  ERROR   no auxiliary transport to <no debug data>: Unsupported operation

@@ -1,6 +1,6 @@
 #/usr/bin/env bash
 
-for i in results/128x128x128x128/3x3x3x3 results/128x128x128x128/4x4x4x4 ;
+for i in results/128x128x128x128/2x2x2x2 results/128x128x128x128/3x3x3x3 results/128x128x128x128/4x4x4x4 ;
 do
     echo $i
 

@@ -70,15 +70,15 @@ uint seed(uint4 p) {
     return 19u * p.x + 47u * p.y + 101u * p.z + 131u * p.w + 173u;
 }
 
-uint lincomb(uint2 p) {
+uint lcgcombine(uint2 p) {
     return p.x * 1664525u + p.y * 16807u + 1013904223u;
 }
 
-uint lincomb(uint3 p) {
+uint lcgcombine(uint3 p) {
     return p.x * 1664525u + p.y * 16807u + p.x * 22695477 + 1013904223u;
 }
 
-uint lincomb(uint4 p) {
+uint lcgcombine(uint4 p) {
     return p.x * 1664525u + p.y * 16807u + p.x * 22695477 + p.w * 134775813 + 1013904223u;
 }
 

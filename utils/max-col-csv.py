@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import numpy as np
 import sys
@@ -7,7 +7,8 @@ if __name__ == "__main__":
 
     files = sys.argv[1:]
 
-    data = [np.loadtxt(file, delimiter=",", dtype=np.uint64, skiprows=1, usecols=range(1,32)) for file in files]
+    # Read 32 score columns after the hash label.
+    data = [np.loadtxt(file, delimiter=",", dtype=np.uint64, skiprows=1, usecols=range(1,33)) for file in files]
 
     data = np.vstack(data)
     data = np.nanmax(data, axis=0)

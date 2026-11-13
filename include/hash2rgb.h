@@ -45,19 +45,19 @@ uint32_t hash2rgb(char* hashname, uint x, uint y, uint z, uint w)
         uint h = HASH(HASH(HASH(HASH(x) + y) + z) + w);\
         return h;                           \
     }                                       \
-    else if (strcmp(hashname, #HASH "_lincomb2") == 0) \
+    else if (strcmp(hashname, #HASH "_lcgcombine2") == 0) \
     {                                       \
-        uint h = HASH(lincomb(uint2(x,y))); \
+        uint h = HASH(lcgcombine(uint2(x,y))); \
         return h;                           \
     }                                       \
-    else if (strcmp(hashname, #HASH "_lincomb3") == 0) \
+    else if (strcmp(hashname, #HASH "_lcgcombine3") == 0) \
     {                                       \
-        uint h = HASH(lincomb(uint3(x,y,z))); \
+        uint h = HASH(lcgcombine(uint3(x,y,z))); \
         return h;                           \
     }                                       \
-    else if (strcmp(hashname, #HASH "_lincomb4") == 0) \
+    else if (strcmp(hashname, #HASH "_lcgcombine4") == 0) \
     {                                       \
-        uint h = HASH(lincomb(uint4(x,y,z,w))); \
+        uint h = HASH(lcgcombine(uint4(x,y,z,w))); \
         return h;                           \
     }
 

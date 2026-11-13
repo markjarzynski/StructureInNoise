@@ -75,11 +75,11 @@ uint lcgcombine(uint2 p) {
 }
 
 uint lcgcombine(uint3 p) {
-    return p.x * 1664525u + p.y * 16807u + p.x * 22695477 + 1013904223u;
+    return p.x * 1664525u + p.y * 16807u + p.z * 22695477 + 1013904223u;
 }
 
 uint lcgcombine(uint4 p) {
-    return p.x * 1664525u + p.y * 16807u + p.x * 22695477 + p.w * 134775813 + 1013904223u;
+    return p.x * 1664525u + p.y * 16807u + p.z * 22695477 + p.w * 134775813 + 1013904223u;
 }
 
 // Hashes

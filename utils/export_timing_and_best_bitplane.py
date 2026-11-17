@@ -242,6 +242,43 @@ def write_output(
             output.close()
 
 
+def filter_pareto_frontier(
+    rows: List[Tuple[str, float, List[Tuple[int, int]]]],
+) -> List[Tuple[str, float, List[Tuple[int, int]]]]:
+    """Keep only non-dominated rows on the (timing, best-score) Pareto frontier.
+
+    Objectives are minimized:
+    - median_timing
+    - best[0][0] (lowest bitplane score)
+    """
+    frontier: List[Tuple[str, float, List[Tuple[int, int]]]] = []
+
+    for i, row_i in enumerate(rows):
+        _, timing_i, best_i = row_i
+        score_i = best_i[0][0]
+        dominated = False
+
+        for j, row_j in enumerate(rows):
+            if i == j:
+                continue
+
+            _, timing_j, best_j = row_j
+            score_j = best_j[0][0]
+
+            if (
+                timing_j <= timing_i
+                and score_j <= score_i
+                and (timing_j < timing_i or score_j < score_i)
+            ):
+                dominated = True
+                break
+
+        if not dominated:
+            frontier.append(row_i)
+
+    return frontier
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Export hash median timings with lowest bitplane score and index"
@@ -274,6 +311,24 @@ def main() -> int:
         default=1,
         help="Number of best (lowest-score) bitplanes to export per hash (default: 1)",
     )
+    parser.add_argument(
+        "--pareto-only",
+        action="store_true",
+        help=(
+            "Output only hashes on the Pareto frontier using median_timing and "
+            "best1_score as minimization objectives"
+        ),
+    )
+    parser.add_argument(
+        "--sort-by-timing",
+        action="store_true",
+        help="Sort output rows by median timing (ascending)",
+    )
+    parser.add_argument(
+        "--sort-by-score",
+        action="store_true",
+        help="Sort output rows by best1 score (ascending)",
+    )
 
     args = parser.parse_args()
 
@@ -283,6 +338,14 @@ def main() -> int:
     timings = load_timing_medians(Path(args.timings_csv))
     scores = merge_score_inputs([Path(p) for p in args.score_inputs], stat=args.score_stat)
     rows = build_output_rows(timings, scores, best_bitplanes=args.best_bitplanes)
+    if args.pareto_only:
+        rows = filter_pareto_frontier(rows)
+    if args.sort_by_timing and args.sort_by_score:
+        rows = sorted(rows, key=lambda x: (x[2][0][0], x[1], x[0]))
+    elif args.sort_by_score:
+        rows = sorted(rows, key=lambda x: (x[2][0][0], x[0]))
+    elif args.sort_by_timing:
+        rows = sorted(rows, key=lambda x: (x[1], x[0]))
 
     out_file = Path(args.output) if args.output else None
     write_output(rows, out_file, best_bitplanes=args.best_bitplanes)

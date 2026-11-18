@@ -71,15 +71,15 @@ uint seed(uint4 p) {
 }
 
 uint lcgcombine(uint2 p) {
-    return p.x * 1664525u + p.y * 16807u + 1013904223u;
+    return 1664525u * p.x + 16807u * p.y + 1013904223u;
 }
 
 uint lcgcombine(uint3 p) {
-    return p.x * 1664525u + p.y * 16807u + p.z * 22695477 + 1013904223u;
+    return 1664525u * p.x + 16807u * p.y + 22695477 * p.z + 1013904223u;
 }
 
 uint lcgcombine(uint4 p) {
-    return p.x * 1664525u + p.y * 16807u + p.z * 22695477 + p.w * 134775813 + 1013904223u;
+    return 1664525u * p.x + 16807u * p.y + 22695477 * p.z + 134775813 * p.w + 1013904223u;
 }
 
 // Hashes

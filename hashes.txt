@@ -1,4 +1,3 @@
-bbs
 city_1
 city_2
 city_2.x
@@ -99,6 +98,15 @@ one_at_a_time_2
 one_at_a_time_3
 one_at_a_time_4
 pcg
+pcg_linear2
+pcg_linear3
+pcg_linear4
+pcg_nested2
+pcg_nested3
+pcg_nested4
+pcg_lcgcombine2
+pcg_lcgcombine3
+pcg_lcgcombine4
 pcg2d
 pcg2d.x
 pcg2d.y

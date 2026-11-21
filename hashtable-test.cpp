@@ -257,7 +257,6 @@ int main(int argc, char** argv)
     */
 
     uint64_t bit_matches[BITS] = { 0 };
-    //uint64_t bit_matches2[BITS] = { 0 };
 
     for (int b = bstart; b < bend; b++)
     {
@@ -424,6 +423,22 @@ int main(int argc, char** argv)
                     bit_matches[b] += world_bit_matches[i * BITS + b];
                 }
             }
+        }
+    }
+#else
+    for (int b = bstart; b < bend; b++)
+    {
+        for (const auto& [hash, count] : bit_maps[b])
+        {
+            if (count > 1)
+            {
+                bit_matches[b] += (uint64_t)count * (uint64_t)(count - 1);
+            }
+        }
+
+        if (verbose)
+        {
+            printf("bit: %d, matches: %" PRIu64 "\n", b, bit_matches[b]);
         }
     }
 #endif

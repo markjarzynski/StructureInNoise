@@ -124,6 +124,10 @@ pcg4d.y
 pcg4d.z
 pcg4d.w
 pcg4d2
+pcg4d2.x
+pcg4d2.y
+pcg4d2.z
+pcg4d2.w
 pixar_randfloat
 prospector_best
 prospector_best_linear2

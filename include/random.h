@@ -75,11 +75,11 @@ uint lcgcombine(uint2 p) {
 }
 
 uint lcgcombine(uint3 p) {
-    return 1664525u * p.x + 16807u * p.y + 22695477 * p.z + 1013904223u;
+    return 1664525u * p.x + 16807u * p.y + 22695477u * p.z + 1013904223u;
 }
 
 uint lcgcombine(uint4 p) {
-    return 1664525u * p.x + 16807u * p.y + 22695477 * p.z + 134775813 * p.w + 1013904223u;
+    return 1664525u * p.x + 16807u * p.y + 22695477u * p.z + 134775813u * p.w + 1013904223u;
 }
 
 // Hashes
@@ -1019,43 +1019,23 @@ uint4 pcg4d(uint4 v)
     v.w += v.y*v.z;
 
     return v;
-
-    /*
-	v = v * 1664525u + 1013904223u;   
-    
-    v.x += v.y*v.w;
-    v.y += v.z*v.x;
-    v.z += v.x*v.y;
-    v.w += v.y*v.z;
-
-
-    v.x += v.y*v.w;
-    v.y += v.z*v.x;
-    v.z += v.x*v.y;
-    v.w += v.y*v.z;
-
-    v = v ^ (v>>16u);
-
-    return v;
-    
-    */
 }
 
 uint4 pcg4d2(uint4 v)
 {
     v = v * 1664525u + 1013904223u;
 
-    v.x += v.z*v.w;
-    v.y += v.w*v.x;
-    v.z += v.x*v.y;
-    v.w += v.y*v.z;
+    v.x += v.y*v.z;
+    v.y += v.z*v.w;
+    v.z += v.w*v.x;
+    v.w += v.x*v.y;
 
     v = v ^ (v >> 16u);
 
-    v.x += v.z*v.w;
-    v.y += v.w*v.x;
-    v.z += v.x*v.y;
-    v.w += v.y*v.z;
+    v.x += v.y*v.z;
+    v.y += v.z*v.w;
+    v.z += v.w*v.x;
+    v.w += v.x*v.y;
 
     return v;
 }
